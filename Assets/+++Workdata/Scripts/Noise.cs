@@ -33,14 +33,14 @@ public static class Noise
     }
 
 
-    public static float[,] ValueNoise2D(int width, int height, int seed, float scale, int octaves, float persistence,
-        float lacunarity, Vector2 offset, Vector2 XYScale, int turbulence, float brightness, float crease, bool invert)
+    public static float[,] ValueNoise2D(int width, int height, int seed, Vector2 offset, Vector2 XYScale,
+        NoiseSettings noiseSettings)
     {
         float[,] valueMap = new float[width, height];
 
         System.Random prng = new System.Random(seed);
-        Vector2[] octaveOffsets = new Vector2[octaves];
-        for (int i = 0; i < octaves; i++)
+        Vector2[] octaveOffsets = new Vector2[noiseSettings.octaves];
+        for (int i = 0; i < noiseSettings.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + offset.x;
             float offsetY = prng.Next(-100000, 100000) + offset.y;
@@ -61,14 +61,14 @@ public static class Noise
                 float amplitude = 0.5f;
                 float frequency = 1f;
 
-                for (int i = 0; i < octaves; i++)
+                for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = ((x - halfWidth) / scale - octaveOffsets[i].x) * frequency;
-                    float sampleY = ((y - halfHeight) / scale - octaveOffsets[i].y) * frequency;
+                    float sampleX = ((x - halfWidth) / noiseSettings.scale - octaveOffsets[i].x) * frequency;
+                    float sampleY = ((y - halfHeight) / noiseSettings.scale - octaveOffsets[i].y) * frequency;
 
                     float value = ValueNoise(sampleX * XYScale.x, sampleY * XYScale.y) * 2 - 1;
 
-                    if (turbulence == 1)
+                    if (noiseSettings.turbulence == 1)
                     {
                         value = value;
                     }
@@ -77,13 +77,13 @@ public static class Noise
                         //TURBULENCE
                         value = Abs(value);
 
-                        value = Pow(value, 1f / (crease + 1));
+                        value = Pow(value, 1f / (noiseSettings.crease + 1));
                     }
 
                     noiseHeight += value * amplitude;
 
-                    amplitude *= persistence;
-                    frequency *= lacunarity;
+                    amplitude *= noiseSettings.persistence;
+                    frequency *= noiseSettings.lacunarity;
                 }
 
                 if (noiseHeight > maxNoise)
@@ -91,7 +91,7 @@ public static class Noise
                 if (noiseHeight < minNoise)
                     minNoise = noiseHeight;
 
-                valueMap[x, y] = noiseHeight * brightness;
+                valueMap[x, y] = noiseHeight * noiseSettings.brightness;
             }
         }
 
@@ -99,7 +99,7 @@ public static class Noise
         {
             for (int x = 0; x < width; x++)
             {
-                valueMap[x, y] = invert
+                valueMap[x, y] = noiseSettings.invert
                     ? 1 - InverseLerp(minNoise, maxNoise, valueMap[x, y])
                     : InverseLerp(minNoise, maxNoise, valueMap[x, y]);
             }
@@ -112,23 +112,18 @@ public static class Noise
 
     #region Perlin Noise
 
-    public static float[,] PerlinNoise2D(int width, int height, int seed, float scale, int octaves, float persistence,
-        float lacunarity, Vector2 offset, Vector2 XYScale, int turbulence, float brightness, float crease, bool invert)
+    public static float[,] PerlinNoise2D(int width, int height, int seed, Vector2 offset, Vector2 XYScale,
+        NoiseSettings noiseSettings)
     {
         float[,] noiseMap = new float[width, height];
 
         System.Random prng = new System.Random(seed);
-        Vector2[] octaveOffsets = new Vector2[octaves];
-        for (int i = 0; i < octaves; i++)
+        Vector2[] octaveOffsets = new Vector2[noiseSettings.octaves];
+        for (int i = 0; i < noiseSettings.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + offset.x;
             float offsetY = prng.Next(-100000, 100000) + offset.y;
             octaveOffsets[i] = new Vector2(offsetX, offsetY);
-        }
-
-        if (scale <= 0)
-        {
-            scale = 0.0001f;
         }
 
         float maxNoiseHeight = float.MinValue;
@@ -146,31 +141,33 @@ public static class Noise
                 float frequency = 1;
                 float noiseHeight = 0;
 
-                for (int i = 0; i < octaves; i++)
+                for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = ((x - halfWidth) / scale * XYScale.x - octaveOffsets[i].x) * frequency;
-                    float sampleY = ((y - halfHeight) / scale * XYScale.y - octaveOffsets[i].y) * frequency;
+                    float sampleX = ((x - halfWidth) / noiseSettings.scale * XYScale.x - octaveOffsets[i].x) *
+                                    frequency;
+                    float sampleY = ((y - halfHeight) / noiseSettings.scale * XYScale.y - octaveOffsets[i].y) *
+                                    frequency;
 
                     float perlinValue = PerlinNoise(sampleX, sampleY) * 2 - 1;
 
-                    if (turbulence == 1)
+                    if (noiseSettings.turbulence == 1)
                     {
                         perlinValue = perlinValue;
-                        
-                        perlinValue = Pow(perlinValue, 1f / (crease + 1));
+
+                        perlinValue = Pow(perlinValue, 1f / (noiseSettings.crease + 1));
                     }
                     else
                     {
                         //TURBULENCE
                         perlinValue = Abs(perlinValue);
 
-                        perlinValue = Pow(perlinValue, 1f / (crease + 1));
+                        perlinValue = Pow(perlinValue, 1f / (noiseSettings.crease + 1));
                     }
 
                     noiseHeight += perlinValue * amplitude;
 
-                    amplitude *= persistence;
-                    frequency *= lacunarity;
+                    amplitude *= noiseSettings.persistence;
+                    frequency *= noiseSettings.lacunarity;
                 }
 
                 if (noiseHeight > maxNoiseHeight)
@@ -183,7 +180,7 @@ public static class Noise
                     minNoiseHeight = noiseHeight;
                 }
 
-                noiseMap[x, y] = noiseHeight * brightness;
+                noiseMap[x, y] = noiseHeight * noiseSettings.brightness;
             }
         }
 
@@ -191,7 +188,7 @@ public static class Noise
         {
             for (int x = 0; x < width; x++)
             {
-                noiseMap[x, y] = invert
+                noiseMap[x, y] = noiseSettings.invert
                     ? 1 - InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y])
                     : InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
             }
@@ -227,15 +224,14 @@ public static class Noise
     }
 
 
-    public static float[,] VoronoiNoise2D(int width, int height, int seed, float scale, int octaves, float persistence,
-        float lacunarity, Vector2 offset, Vector2 XYScale, int turbulence, float brightness, float crease, bool invert,
-        float randomness)
+    public static float[,] VoronoiNoise2D(int width, int height, int seed, Vector2 offset, Vector2 XYScale,
+        NoiseSettings noiseSettings)
     {
         float[,] voronoiMap = new float[width, height];
 
         System.Random prng = new System.Random(seed);
-        Vector2[] octaveOffsets = new Vector2[octaves];
-        for (int i = 0; i < octaves; i++)
+        Vector2[] octaveOffsets = new Vector2[noiseSettings.octaves];
+        for (int i = 0; i < noiseSettings.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + offset.x;
             float offsetY = prng.Next(-100000, 100000) + offset.y;
@@ -256,29 +252,30 @@ public static class Noise
                 float amplitude = 0.5f;
                 float frequency = 1f;
 
-                for (int i = 0; i < octaves; i++)
+                for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = ((x - halfWidth) / scale - octaveOffsets[i].x) * frequency;
-                    float sampleY = ((y - halfHeight) / scale - octaveOffsets[i].y) * frequency;
+                    float sampleX = ((x - halfWidth) / noiseSettings.scale - octaveOffsets[i].x) * frequency;
+                    float sampleY = ((y - halfHeight) / noiseSettings.scale - octaveOffsets[i].y) * frequency;
 
-                    float voronoiValue = VoronoiNoise(sampleX * XYScale.x, sampleY * XYScale.y, randomness) * 2 - 1;
+                    float voronoiValue =
+                        VoronoiNoise(sampleX * XYScale.x, sampleY * XYScale.y, noiseSettings.randomness) * 2 - 1;
 
-                    if (turbulence == 1)
+                    if (noiseSettings.turbulence == 1)
                     {
                         voronoiValue = voronoiValue;
                     }
-                    else if (turbulence == 2)
+                    else if (noiseSettings.turbulence == 2)
                     {
                         //TURBULENCE
                         voronoiValue = Abs(voronoiValue);
 
-                        voronoiValue = Pow(voronoiValue, 1f / (crease + 1));
+                        voronoiValue = Pow(voronoiValue, 1f / (noiseSettings.crease + 1));
                     }
 
                     noiseHeight += voronoiValue * amplitude;
 
-                    amplitude *= persistence;
-                    frequency *= lacunarity;
+                    amplitude *= noiseSettings.persistence;
+                    frequency *= noiseSettings.lacunarity;
                 }
 
                 if (noiseHeight > maxNoise)
@@ -286,7 +283,9 @@ public static class Noise
                 if (noiseHeight < minNoise)
                     minNoise = noiseHeight;
 
-                voronoiMap[x, y] = invert ? 1 - noiseHeight * brightness : noiseHeight * brightness;
+                voronoiMap[x, y] = noiseSettings.invert
+                    ? 1 - noiseHeight * noiseSettings.brightness
+                    : noiseHeight * noiseSettings.brightness;
             }
         }
 
