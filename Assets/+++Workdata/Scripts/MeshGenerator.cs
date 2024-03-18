@@ -30,7 +30,6 @@ public static class MeshGenerator
 
         return meshData;
     }
-
 }
 
 public class MeshData

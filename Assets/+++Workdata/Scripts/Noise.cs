@@ -63,10 +63,12 @@ public static class Noise
 
                 for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = ((x - halfWidth) / noiseSettings.scale - octaveOffsets[i].x) * frequency;
-                    float sampleY = ((y - halfHeight) / noiseSettings.scale - octaveOffsets[i].y) * frequency;
+                    float sampleX = ((x - halfWidth) / noiseSettings.scale * XYScale.x - octaveOffsets[i].x) *
+                                    frequency;
+                    float sampleY = ((y - halfHeight) / noiseSettings.scale * XYScale.y - octaveOffsets[i].y) *
+                                    frequency;
 
-                    float value = ValueNoise(sampleX * XYScale.x, sampleY * XYScale.y) * 2 - 1;
+                    float value = ValueNoise(sampleX, sampleY) * 2 - 1;
 
                     if (noiseSettings.turbulence == 1)
                     {
