@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using static UnityEngine.Mathf;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class MapDisplay : MonoBehaviour
 {
     public enum NoiseType
@@ -13,8 +13,8 @@ public class MapDisplay : MonoBehaviour
     }
 
     [SerializeField] NoiseType noiseType;
-    [SerializeField] int width = 256;
-    [SerializeField] int height = 256;
+    [SerializeField] int width = 241;
+    [SerializeField] int height = 241;
     [SerializeField] int seed;
     [SerializeField] Vector2 offset;
     [Space(10)] [SerializeField] NoiseSettings noiseSettings;
@@ -39,21 +39,21 @@ public class MapDisplay : MonoBehaviour
         switch (noiseType)
         {
             case NoiseType.ValueNoise2D:
-                float[,] valueMap = Noise.ValueNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+                float[,] valueMap = OldNoise.ValueNoise2D(width, height, seed, offset, xyScale, noiseSettings);
                 NoiseMapVisualisation(valueMap);
                 DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, width, height, noiseSettings));
                 break;
 
             case NoiseType.PerlinNoise2D:
                 float[,] perlinMap =
-                    Noise.PerlinNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+                    OldNoise.PerlinNoise2D(width, height, seed, offset, xyScale, noiseSettings);
                 NoiseMapVisualisation(perlinMap);
                 DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, width, height, noiseSettings));
                 break;
 
             case NoiseType.VoronoiNoise2D:
                 float[,] voronoiMap =
-                    Noise.VoronoiNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+                    OldNoise.VoronoiNoise2D(width, height, seed, offset, xyScale, noiseSettings);
                 NoiseMapVisualisation(voronoiMap);
                 DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, width, height, noiseSettings));
                 break;
@@ -62,7 +62,8 @@ public class MapDisplay : MonoBehaviour
 
     public void DrawMesh(MeshData meshData)
     {
-        FindObjectOfType<MeshFilter>().mesh = meshData.CreateMesh();
+        GetComponent<MeshFilter>().sharedMesh = meshData.CreateMesh();
+        GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
     }
 
     public void NoiseMapVisualisation(float[,] map)
@@ -113,9 +114,9 @@ public class MapDisplay : MonoBehaviour
 }
 
 [Serializable]
-public class NoiseSettings
+public struct NoiseSettings
 {
-    [Min(0.1f)] public float heightMultiplier;
+    [Min(0.0001f)] public float heightMultiplier;
     [Range(1, 30f)] public float randomness;
     [Min(0.0001f)] public float scale;
     [Range(1, 5)] public int octaves;
@@ -123,7 +124,21 @@ public class NoiseSettings
     [Range(0f, 1f)] public float persistence;
 
     [Space(5)] [Range(1, 2)] public int turbulence;
-    [Min(0.01f)] public float brightness = 1f;
-    [Range(0, 5)] public float crease = 1f;
-    public bool invert = false;
+    [Min(0.01f)] public float brightness;
+    [Range(0, 5)] public float crease;
+    public bool invert;
+
+    public static NoiseSettings Default => new NoiseSettings
+    {
+        heightMultiplier = 40f,
+        randomness = 1f,
+        scale = 25f,
+        octaves = 4,
+        lacunarity = 2f,
+        persistence = 0.4f,
+        turbulence = 1,
+        brightness = 1f,
+        crease = 1f,
+        invert = false
+    };
 }
