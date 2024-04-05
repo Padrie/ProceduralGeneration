@@ -5,20 +5,7 @@ using static UnityEngine.Mathf;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class MapDisplay : MonoBehaviour
 {
-    public enum NoiseType
-    {
-        ValueNoise2D,
-        PerlinNoise2D,
-        VoronoiNoise2D
-    }
-
-    [SerializeField] NoiseType noiseType;
-    [SerializeField] int width = 241;
-    [SerializeField] int height = 241;
-    [SerializeField] int seed;
-    [SerializeField] Vector2 offset;
     [Space(10)] [SerializeField] NoiseSettings noiseSettings;
-    [Space(10)] [Min(.1f), SerializeField] Vector2 xyScale = new Vector2(1f, 1f);
     public int isolines;
     [SerializeField] private string pngName;
     [SerializeField] bool png = false;
@@ -36,26 +23,26 @@ public class MapDisplay : MonoBehaviour
     {
         textureRender = GetComponent<Renderer>();
 
-        switch (noiseType)
+        switch (noiseSettings.noiseType)
         {
-            case NoiseType.ValueNoise2D:
-                float[,] valueMap = OldNoise.ValueNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+            case NoiseSettings.NoiseType.ValueNoise2D:
+                float[,] valueMap = ValueNoise.ValueNoise2D(noiseSettings);
                 NoiseMapVisualisation(valueMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, width, height, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, noiseSettings));
                 break;
 
-            case NoiseType.PerlinNoise2D:
+            case NoiseSettings.NoiseType.PerlinNoise2D:
                 float[,] perlinMap =
-                    OldNoise.PerlinNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+                    PerlinNoise.PerlinNoise2D(noiseSettings);
                 NoiseMapVisualisation(perlinMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, width, height, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, noiseSettings));
                 break;
 
-            case NoiseType.VoronoiNoise2D:
+            case NoiseSettings.NoiseType.VoronoiNoise2D:
                 float[,] voronoiMap =
-                    OldNoise.VoronoiNoise2D(width, height, seed, offset, xyScale, noiseSettings);
+                    VoronoiNoise.VoronoiNoise2D(noiseSettings);
                 NoiseMapVisualisation(voronoiMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, width, height, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, noiseSettings));
                 break;
         }
     }
@@ -68,8 +55,8 @@ public class MapDisplay : MonoBehaviour
 
     public void NoiseMapVisualisation(float[,] map)
     {
-        Texture2D texture2D = new Texture2D(width, height);
-        Color[] colorMap = new Color[width * height];
+        Texture2D texture2D = new Texture2D(noiseSettings.width, noiseSettings.height);
+        Color[] colorMap = new Color[noiseSettings.width * noiseSettings.height];
         texture2D.filterMode = FilterMode.Point;
         texture2D.wrapMode = TextureWrapMode.Clamp;
 
@@ -82,12 +69,12 @@ public class MapDisplay : MonoBehaviour
             minDistance = Min(minDistance, value);
         }
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < noiseSettings.height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < noiseSettings.width; x++)
             {
                 float normalizedDistance = InverseLerp(minDistance, maxDistance, map[x, y]);
-                colorMap[y * width + x] = Color.Lerp(
+                colorMap[y * noiseSettings.width + x] = Color.Lerp(
                     new Color(
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
@@ -101,7 +88,7 @@ public class MapDisplay : MonoBehaviour
         texture2D.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture2D;
-        transform.localScale = new Vector3(width, 1, height) / 150f;
+        transform.localScale = new Vector3(noiseSettings.width, 1, noiseSettings.height) / 150f;
 
 
         if (png)
@@ -116,6 +103,20 @@ public class MapDisplay : MonoBehaviour
 [Serializable]
 public struct NoiseSettings
 {
+    public enum NoiseType
+    {
+        ValueNoise2D,
+        PerlinNoise2D,
+        VoronoiNoise2D
+    }
+
+    public NoiseType noiseType;
+    
+    public int width;
+    public int height;
+    public int seed;
+    public Vector2 offset;
+    
     [Min(0.0001f)] public float heightMultiplier;
     [Range(1, 30f)] public float randomness;
     [Min(0.0001f)] public float scale;
@@ -124,12 +125,14 @@ public struct NoiseSettings
     [Range(0f, 1f)] public float persistence;
 
     [Space(5)] [Range(1, 2)] public int turbulence;
-    [Min(0.01f)] public float brightness;
     [Range(0, 5)] public float crease;
     public bool invert;
+    [Space(10)] [Min(.1f)] public Vector2 xyScale;
 
     public static NoiseSettings Default => new NoiseSettings
     {
+        width = 241,
+        height = 241,
         heightMultiplier = 40f,
         randomness = 1f,
         scale = 25f,
@@ -137,8 +140,8 @@ public struct NoiseSettings
         lacunarity = 2f,
         persistence = 0.4f,
         turbulence = 1,
-        brightness = 1f,
         crease = 1f,
-        invert = false
+        invert = false,
+        xyScale = new Vector2(1f, 1f)
     };
 }
