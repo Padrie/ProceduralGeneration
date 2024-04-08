@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using static UnityEngine.Mathf;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapDisplay : MonoBehaviour
 {
     [Space(10)] [SerializeField] NoiseSettings noiseSettings;
@@ -50,6 +50,7 @@ public class MapDisplay : MonoBehaviour
     public void DrawMesh(MeshData meshData)
     {
         GetComponent<MeshFilter>().sharedMesh = meshData.CreateMesh();
+        if (GetComponent<MeshCollider>() == null) return;
         GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
     }
 
@@ -111,12 +112,12 @@ public struct NoiseSettings
     }
 
     public NoiseType noiseType;
-    
+
     public int width;
     public int height;
     public int seed;
     public Vector2 offset;
-    
+
     [Min(0.0001f)] public float heightMultiplier;
     [Range(1, 30f)] public float randomness;
     [Min(0.0001f)] public float scale;
