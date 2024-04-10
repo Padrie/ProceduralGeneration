@@ -2,10 +2,9 @@ using System;
 using UnityEngine;
 using static UnityEngine.Mathf;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapDisplay : MonoBehaviour
 {
-    [Space(10)] [SerializeField] NoiseSettings noiseSettings;
+    [Space(10)] public NoiseSettings noiseSettings;
     public int isolines;
     [SerializeField] private string pngName;
     [SerializeField] bool png = false;
@@ -19,7 +18,7 @@ public class MapDisplay : MonoBehaviour
         textureRender = GetComponent<Renderer>();
     }
 
-    private void OnValidate()
+    public void OnValidate()
     {
         textureRender = GetComponent<Renderer>();
 
@@ -102,7 +101,7 @@ public class MapDisplay : MonoBehaviour
 }
 
 [Serializable]
-public struct NoiseSettings
+public class NoiseSettings
 {
     public enum NoiseType
     {
@@ -113,36 +112,20 @@ public struct NoiseSettings
 
     public NoiseType noiseType;
 
-    public int width;
-    public int height;
-    public int seed;
+    public int width = 241;
+    public int height = 241;
+    public int seed = 0;
     public Vector2 offset;
 
-    [Min(0.0001f)] public float heightMultiplier;
-    [Range(1, 30f)] public float randomness;
-    [Min(0.0001f)] public float scale;
-    [Range(1, 5)] public int octaves;
-    [Range(1, 5)] public float lacunarity;
-    [Range(0f, 1f)] public float persistence;
+    [Min(0.0001f)] public float heightMultiplier = 40f;
+    [Range(1, 30f)] public float randomness = 1f;
+    [Min(0.0001f)] public float scale = 25f;
+    [Range(1, 5)] public int octaves = 4;
+    [Range(1, 5)] public float lacunarity = 2f;
+    [Range(0f, 1f)] public float persistence = 0.4f;
 
-    [Space(5)] [Range(1, 2)] public int turbulence;
-    [Range(0, 5)] public float crease;
-    public bool invert;
-    [Space(10)] [Min(.1f)] public Vector2 xyScale;
-
-    public static NoiseSettings Default => new NoiseSettings
-    {
-        width = 241,
-        height = 241,
-        heightMultiplier = 40f,
-        randomness = 1f,
-        scale = 25f,
-        octaves = 4,
-        lacunarity = 2f,
-        persistence = 0.4f,
-        turbulence = 1,
-        crease = 1f,
-        invert = false,
-        xyScale = new Vector2(1f, 1f)
-    };
+    [Space(5)] [Range(1, 2)] public int turbulence = 1;
+    [Range(0, 5)] public float crease = 1f;
+    public bool invert = false;
+    [Space(10)] [Min(.1f)] public Vector2 xyScale = new Vector2(1f, 1f);
 }

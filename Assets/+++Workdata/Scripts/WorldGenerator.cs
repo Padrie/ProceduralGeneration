@@ -9,6 +9,8 @@ public class WorldGenerator : MonoBehaviour
     public GameObject meshObject;
     public int size;
 
+    private Dictionary<Vector2, Chunk> chunkDict = new Dictionary<Vector2, Chunk>();
+
     [ButtonMethod]
     private void Spawn()
     {
@@ -19,14 +21,23 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int j = 0; j < size; j++)
             {
-                GameObject test = Instantiate(meshObject);
-                var renderer = test.GetComponent<Renderer>();
-                
+                GameObject a = Instantiate(meshObject);
+                var renderer = a.GetComponent<Renderer>();
+                var b = a.GetComponent<MapDisplay>();
+
                 Vector3 bounds = renderer.bounds.size;
                 Vector3 position = new Vector3((topLeftX + i) * bounds.x, 0, (topLeftZ - j) * bounds.z);
 
-                test.transform.position = position;
-                test.transform.parent = transform;
+                b.noiseSettings.offset.x = position.x;
+                b.noiseSettings.offset.y = position.z;
+                b.OnValidate();
+                
+                new ChunkInfo(position);
+
+                //chunkDict.Add(position, new Chunk(meshObject, position));
+
+                a.transform.position = position;
+                a.transform.parent = transform;
             }
         }
     }
@@ -38,5 +49,29 @@ public class WorldGenerator : MonoBehaviour
         {
             DestroyImmediate(transform.GetChild(i).gameObject);
         }
+    }
+}
+
+public class ChunkInfo
+{
+    private Vector3 chunkPosition;
+    public ChunkInfo(Vector3 position)
+    {
+        chunkPosition = position;
+        Debug.Log(position);
+    }
+}
+
+[Serializable]
+public class Chunk
+{
+    public GameObject meshObject;
+
+    public Chunk(GameObject gameObject, Vector2 position)
+    {
+        meshObject = gameObject;
+
+        Debug.Log(meshObject);
+        Debug.Log(position);
     }
 }
