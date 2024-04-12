@@ -7,7 +7,7 @@
       "dependencies": {
         "com.unity.ugui": "1.0.0"
       },
-      "hash": "4a582a502cb6af7ce2a031b808f09fe0440f5aeb"
+      "hash": "e56483d404441832a982cca63b3f1b7af3616a7a"
     },
     "com.unity.burst": {
       "version": "1.8.8",
