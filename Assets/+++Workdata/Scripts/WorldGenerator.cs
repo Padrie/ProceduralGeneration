@@ -24,12 +24,13 @@ public class WorldGenerator : MonoBehaviour
                 GameObject a = Instantiate(meshObject);
                 var renderer = a.GetComponent<Renderer>();
                 var b = a.GetComponent<MapDisplay>();
+                var localScale = meshObject.transform.localScale;
 
                 Vector3 bounds = renderer.bounds.size;
-                Vector3 position = new Vector3((topLeftX + i) * bounds.x, 0, (topLeftZ - j) * bounds.z);
-
-                b.noiseSettings.offset.x = position.x;
-                b.noiseSettings.offset.y = position.z;
+                Vector3 position = new Vector3(((topLeftX + i) * bounds.x), 0, (topLeftZ - j) * bounds.z);
+                
+                b.noiseSettings.offset.x = position.x / localScale.x;
+                b.noiseSettings.offset.y = position.z / localScale.x;
                 b.OnValidate();
                 
                 new ChunkInfo(position);

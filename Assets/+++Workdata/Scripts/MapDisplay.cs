@@ -1,10 +1,14 @@
 using System;
+using System.Collections;
+using MyBox;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using static UnityEngine.Mathf;
 
 public class MapDisplay : MonoBehaviour
 {
     [Space(10)] public NoiseSettings noiseSettings;
+    public bool updateMaterial;
     public int isolines;
     [SerializeField] private string pngName;
     [SerializeField] bool png = false;
@@ -21,6 +25,8 @@ public class MapDisplay : MonoBehaviour
     public void OnValidate()
     {
         textureRender = GetComponent<Renderer>();
+        if (updateMaterial)
+            textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
 
         switch (noiseSettings.noiseType)
         {
@@ -31,17 +37,20 @@ public class MapDisplay : MonoBehaviour
                 break;
 
             case NoiseSettings.NoiseType.PerlinNoise2D:
-                float[,] perlinMap =
-                    PerlinNoise.PerlinNoise2D(noiseSettings);
+                float[,] perlinMap = PerlinNoise.PerlinNoise2D(noiseSettings);
                 NoiseMapVisualisation(perlinMap);
                 DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, noiseSettings));
                 break;
 
             case NoiseSettings.NoiseType.VoronoiNoise2D:
-                float[,] voronoiMap =
-                    VoronoiNoise.VoronoiNoise2D(noiseSettings);
+                float[,] voronoiMap = VoronoiNoise.VoronoiNoise2D(noiseSettings);
                 NoiseMapVisualisation(voronoiMap);
                 DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, noiseSettings));
+                break;
+            case NoiseSettings.NoiseType.Mix:
+                float[,] mixMap = VoronoiNoise.VoronoiNoise2D(noiseSettings);
+                NoiseMapVisualisation(mixMap);
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseSettings));
                 break;
         }
     }
@@ -103,17 +112,20 @@ public class MapDisplay : MonoBehaviour
 [Serializable]
 public class NoiseSettings
 {
+    public NoiseVariants.NormalizeMode normalizeMode;
+
     public enum NoiseType
     {
         ValueNoise2D,
         PerlinNoise2D,
-        VoronoiNoise2D
+        VoronoiNoise2D,
+        Mix
     }
 
     public NoiseType noiseType;
 
-    public int width = 241;
-    public int height = 241;
+    public int width = 150;
+    public int height = 150;
     public int seed = 0;
     public Vector2 offset;
 
