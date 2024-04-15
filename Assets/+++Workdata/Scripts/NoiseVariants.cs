@@ -29,13 +29,14 @@ public class NoiseVariants
     {
         float[,] map = new float[noiseSettings.width, noiseSettings.height];
         
+        //Seed
         System.Random prng = new System.Random(noiseSettings.seed);
-        Vector2[] octaveOffsets = new Vector2[noiseSettings.octaves];
+        Vector2[] seed = new Vector2[noiseSettings.octaves];
         for (int i = 0; i < noiseSettings.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + noiseSettings.offset.x;
             float offsetY = prng.Next(-100000, 100000) + noiseSettings.offset.y;
-            octaveOffsets[i] = new Vector2(offsetX, offsetY);
+            seed[i] = new Vector2(offsetX, offsetY);
         }
 
         float maxNoise = float.MinValue;
@@ -56,10 +57,10 @@ public class NoiseVariants
 
                 for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = (x - halfWidth + octaveOffsets[i].x) * noiseSettings.xyScale.x /
+                    float sampleX = (x - halfWidth + seed[i].x) * noiseSettings.xyScale.x /
                         noiseSettings.scale * frequency;
-                    float sampleY = ((y - halfHeight - octaveOffsets[i].y) * noiseSettings.xyScale.y /
-                                     noiseSettings.scale) * frequency;
+                    float sampleY = (y - halfHeight - seed[i].y) * noiseSettings.xyScale.y /
+                                     noiseSettings.scale * frequency;
 
                     float value = 0f;
 
@@ -75,7 +76,7 @@ public class NoiseVariants
                     if (noiseSettings.noiseType == NoiseSettings.NoiseType.Mix)
                     {
                         var a = Noise.ValueNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
-                        value = (PerlinNoise(sampleX, sampleY) * 2 - 1) - a - a;
+                        value = (PerlinNoise(sampleX, sampleY) * 2 - 1) * a;
                     }
 
 
