@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Cinemachine;
 using MyBox;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,12 +10,19 @@ public class RaycastTest : MonoBehaviour
 {
     public List<GameObject> gameObjects = new List<GameObject>();
     public Transform parent;
+    public int seed;
+    public int dotAmount = 10;
 
     [ButtonMethod]
-    public void OnValidate()
+    public void SpawnDots()
     {
         gameObjects.Clear();
+        System.Random prng = new System.Random(seed);
 
+        for (int i = 0; i < 2; i++)
+            foreach (Transform child in parent.transform)
+                DestroyImmediate(child.gameObject);
+        
         foreach (Transform child in transform)
         {
             gameObjects.Add(child.gameObject);
@@ -32,15 +40,13 @@ public class RaycastTest : MonoBehaviour
             plane.name = "New Plane";
             plane.transform.parent = parent.transform;
 
-            for (int j = 0; j < 30; j++)
+            for (int j = 0; j < dotAmount / gameObjects.Count; j++)
             {
-                Vector3 rng = new Vector3(Random.Range(bounds.x * -1, bounds.x), Random.Range(bounds.x * -1, bounds.x),
-                    Random.Range(bounds.x * -1, bounds.x)) / 2;
+                Vector3 rng = new Vector3((float)prng.NextDouble() * bounds.x, (float)prng.NextDouble() * bounds.y, (float)prng.NextDouble() * bounds.z) - bounds * 0.5f;
                 var dot = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 dot.transform.localScale = new Vector3(5, 5, 5);
                 dot.transform.parent = plane.transform;
-                dot.transform.position = new Vector3(plane.transform.position.x + rng.x, plane.transform.position.y,
-                    plane.transform.position.z + rng.z);
+                dot.transform.position = new Vector3(plane.transform.position.x + rng.x, plane.transform.position.y, plane.transform.position.z + rng.z);
             }
         }
     }
