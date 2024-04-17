@@ -11,7 +11,6 @@ public class RaycastTest : MonoBehaviour
 {
     List<GameObject> gameObjects = new List<GameObject>();
     public List<StructureClass> structureList = new List<StructureClass>();
-    public Transform parent;
     public int seed;
     [Space(10)] public LayerMask layerToHit;
 
@@ -20,6 +19,8 @@ public class RaycastTest : MonoBehaviour
     {
         gameObjects.Clear();
         System.Random prng = new System.Random(seed);
+        GameObject parent = new GameObject();
+        int track = 0;
 
         for (int i = 0; i < 2; i++)
             foreach (Transform child in parent.transform)
@@ -61,20 +62,24 @@ public class RaycastTest : MonoBehaviour
                         structureList[k].name = structureList[k].asset.name;
 
                         if (structureList[k].invert
-                                ? Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle
-                                : Mathf.Abs(hit.normal.y) < structureList[k].slopeAngle)
+                                ? Mathf.Abs(hit.normal.y) < structureList[k].slopeAngle
+                                : Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle)
                         {
                             var asset = Instantiate(structureList[k].asset);
                             asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
                             asset.transform.localScale = new Vector3(4, 8, 4);
                             asset.transform.parent = hit.transform;
-                            //asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-                            asset.transform.rotation = Quaternion.identity;
+                            
+                            if (structureList[k].canRotate)
+                                asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                            else
+                                asset.transform.rotation = Quaternion.identity;
                         }
                     }
                 }
             }
         }
+        DestroyImmediate(parent);
     }
 }
 
@@ -86,6 +91,6 @@ public class StructureClass
     public int spawnAmount;
     public int weight;
     [Space(5)] public bool invert;
-    [Range(0f, 1f)] public float slopeAngle;
+    [Range(0.01f, 1f)] public float slopeAngle;
     public bool canRotate;
 }
