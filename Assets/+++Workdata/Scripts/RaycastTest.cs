@@ -13,9 +13,7 @@ public class RaycastTest : MonoBehaviour
     public List<StructureClass> structureList = new List<StructureClass>();
     public Transform parent;
     public int seed;
-    public int dotAmount = 10;
     [Space(10)] public LayerMask layerToHit;
-    [Range(0f, 1f)] public float normal;
 
     [ButtonMethod]
     public void SpawnDots()
@@ -44,30 +42,34 @@ public class RaycastTest : MonoBehaviour
             plane.name = "New Plane";
             plane.transform.parent = parent.transform;
 
-            for (int j = 0; j < dotAmount / gameObjects.Count; j++)
+            for (int k = 0; k < structureList.Count; k++)
             {
-                Vector3 rng = new Vector3((float)prng.NextDouble() * bounds.x, (float)prng.NextDouble() * bounds.y,
-                    (float)prng.NextDouble() * bounds.z) - bounds * 0.5f;
-                var dot = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                dot.transform.localScale = new Vector3(5, 5, 5);
-                dot.transform.parent = plane.transform;
-                dot.transform.position = new Vector3(plane.transform.position.x + rng.x, plane.transform.position.y,
-                    plane.transform.position.z + rng.z);
-
-                Ray ray = new Ray(dot.transform.position, Vector3.down);
-
-                if (Physics.Raycast(ray, out RaycastHit hit, 10000, layerToHit))
+                for (int j = 0; j < structureList[k].spawnAmount / gameObjects.Count; j++)
                 {
-                    Debug.Log(hit.collider.gameObject.name);
-                    Debug.Log(hit.normal);
+                    Vector3 rng = new Vector3((float)prng.NextDouble() * bounds.x, (float)prng.NextDouble() * bounds.y,
+                        (float)prng.NextDouble() * bounds.z) - bounds * 0.5f;
+                    var dot = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    dot.transform.localScale = new Vector3(5, 5, 5);
+                    dot.transform.parent = plane.transform;
+                    dot.transform.position = new Vector3(plane.transform.position.x + rng.x, plane.transform.position.y,
+                        plane.transform.position.z + rng.z);
 
-                    if (Mathf.Abs(hit.normal.y) > normal)
+                    Ray ray = new Ray(dot.transform.position, Vector3.down);
+
+                    if (Physics.Raycast(ray, out RaycastHit hit, 10000, layerToHit))
                     {
-                        var tree = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                        tree.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                        tree.transform.localScale = new Vector3(4, 8, 4);
-                        tree.transform.parent = hit.transform;
-                        tree.transform.rotation = Quaternion.identity;
+                        {
+                            structureList[k].name = structureList[k].asset.name;
+
+                            if (Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle)
+                            {
+                                var asset = Instantiate(structureList[k].asset);
+                                asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                                asset.transform.localScale = new Vector3(4, 8, 4);
+                                asset.transform.parent = hit.transform;
+                                asset.transform.rotation = Quaternion.identity;
+                            }
+                        }
                     }
                 }
             }
@@ -78,9 +80,10 @@ public class RaycastTest : MonoBehaviour
 [Serializable]
 public class StructureClass
 {
-    public string name;
+    [HideInInspector] public string name;
     public GameObject asset;
+    public int spawnAmount;
     public int weight;
-    [Range(0f, 1f)] public int slopeAngle;
+    [Range(0f, 1f)] public float slopeAngle;
     public bool canRotate;
 }
