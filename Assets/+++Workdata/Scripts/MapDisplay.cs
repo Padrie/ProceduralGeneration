@@ -97,7 +97,7 @@ public class MapDisplay : MonoBehaviour
         texture2D.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture2D;
-        transform.localScale = new Vector3(noiseSettings.width, 1, noiseSettings.height) / 150f;
+        transform.localScale = new Vector3(noiseSettings.width, 150, noiseSettings.height) / 150f;
 
 
         if (png)

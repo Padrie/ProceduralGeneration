@@ -58,17 +58,18 @@ public class RaycastTest : MonoBehaviour
 
                     if (Physics.Raycast(ray, out RaycastHit hit, 10000, layerToHit))
                     {
-                        {
-                            structureList[k].name = structureList[k].asset.name;
+                        structureList[k].name = structureList[k].asset.name;
 
-                            if (Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle)
-                            {
-                                var asset = Instantiate(structureList[k].asset);
-                                asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                                asset.transform.localScale = new Vector3(4, 8, 4);
-                                asset.transform.parent = hit.transform;
-                                asset.transform.rotation = Quaternion.identity;
-                            }
+                        if (structureList[k].invert
+                                ? Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle
+                                : Mathf.Abs(hit.normal.y) < structureList[k].slopeAngle)
+                        {
+                            var asset = Instantiate(structureList[k].asset);
+                            asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                            asset.transform.localScale = new Vector3(4, 8, 4);
+                            asset.transform.parent = hit.transform;
+                            //asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                            asset.transform.rotation = Quaternion.identity;
                         }
                     }
                 }
@@ -84,6 +85,7 @@ public class StructureClass
     public GameObject asset;
     public int spawnAmount;
     public int weight;
+    [Space(5)] public bool invert;
     [Range(0f, 1f)] public float slopeAngle;
     public bool canRotate;
 }

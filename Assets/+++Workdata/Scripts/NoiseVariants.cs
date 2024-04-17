@@ -5,7 +5,6 @@ using Random = UnityEngine.Random;
 
 public class NoiseVariants
 {
-
     static float Turbulence(float value, NoiseSettings noiseSettings)
     {
         if (noiseSettings.turbulence == 1)
@@ -28,7 +27,7 @@ public class NoiseVariants
     public static float[,] Fbm(NoiseSettings noiseSettings)
     {
         float[,] map = new float[noiseSettings.width, noiseSettings.height];
-        
+
         //Seed
         System.Random prng = new System.Random(noiseSettings.seed);
         Vector2[] seed = new Vector2[noiseSettings.octaves];
@@ -57,10 +56,8 @@ public class NoiseVariants
 
                 for (int i = 0; i < noiseSettings.octaves; i++)
                 {
-                    float sampleX = (x - halfWidth + seed[i].x) * noiseSettings.xyScale.x /
-                        noiseSettings.scale * frequency;
-                    float sampleY = (y - halfHeight - seed[i].y) * noiseSettings.xyScale.y /
-                                     noiseSettings.scale * frequency;
+                    float sampleX = (x - halfWidth + seed[i].x) * noiseSettings.xyScale.x / noiseSettings.scale * frequency;
+                    float sampleY = (y - halfHeight - seed[i].y) * noiseSettings.xyScale.y / noiseSettings.scale * frequency;
 
                     float value = 0f;
 

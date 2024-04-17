@@ -14,7 +14,7 @@ public static class MeshGenerator
         {
             for (int x = 0; x < noiseSettings.width; x++)
             {
-                Vector3 vertexPosition = new Vector3((topLeftX + x), heightMap[x, y] * (noiseSettings.heightMultiplier * 100), (topLeftZ - y));
+                Vector3 vertexPosition = new Vector3((topLeftX + x), heightMap[x, y] * (noiseSettings.heightMultiplier), (topLeftZ - y));
                 meshData.vertices[vertexIndex] = vertexPosition;
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)noiseSettings.width, y / (float)noiseSettings.height);
 
