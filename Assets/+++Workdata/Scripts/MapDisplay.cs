@@ -1,13 +1,13 @@
 using System;
-using System.Collections;
 using MyBox;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using static UnityEngine.Mathf;
 
 public class MapDisplay : MonoBehaviour
 {
-    [Space(10)] public NoiseSettings noiseSettings;
+    public NoisePreset noisePreset;
+    public NoiseSettings NoiseSettings => noisePreset.noiseSettings;
+    
     public bool updateMaterial;
     public int isolines;
     [SerializeField] private string pngName;
@@ -28,29 +28,29 @@ public class MapDisplay : MonoBehaviour
         if (updateMaterial)
             textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
 
-        switch (noiseSettings.noiseType)
+        switch (NoiseSettings.noiseType)
         {
             case NoiseSettings.NoiseType.ValueNoise2D:
-                float[,] valueMap = ValueNoise.ValueNoise2D(noiseSettings);
+                float[,] valueMap = ValueNoise.ValueNoise2D(NoiseSettings);
                 NoiseMapVisualisation(valueMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, NoiseSettings));
                 break;
 
             case NoiseSettings.NoiseType.PerlinNoise2D:
-                float[,] perlinMap = PerlinNoise.PerlinNoise2D(noiseSettings);
+                float[,] perlinMap = PerlinNoise.PerlinNoise2D(NoiseSettings);
                 NoiseMapVisualisation(perlinMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(perlinMap, NoiseSettings));
                 break;
 
             case NoiseSettings.NoiseType.VoronoiNoise2D:
-                float[,] voronoiMap = VoronoiNoise.VoronoiNoise2D(noiseSettings);
+                float[,] voronoiMap = VoronoiNoise.VoronoiNoise2D(NoiseSettings);
                 NoiseMapVisualisation(voronoiMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(voronoiMap, NoiseSettings));
                 break;
             case NoiseSettings.NoiseType.Mix:
-                float[,] mixMap = VoronoiNoise.VoronoiNoise2D(noiseSettings);
+                float[,] mixMap = VoronoiNoise.VoronoiNoise2D(NoiseSettings);
                 NoiseMapVisualisation(mixMap);
-                DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseSettings));
+                DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, NoiseSettings));
                 break;
         }
     }
@@ -64,8 +64,8 @@ public class MapDisplay : MonoBehaviour
 
     public void NoiseMapVisualisation(float[,] map)
     {
-        Texture2D texture2D = new Texture2D(noiseSettings.width, noiseSettings.height);
-        Color[] colorMap = new Color[noiseSettings.width * noiseSettings.height];
+        Texture2D texture2D = new Texture2D(NoiseSettings.width, NoiseSettings.height);
+        Color[] colorMap = new Color[NoiseSettings.width * NoiseSettings.height];
         texture2D.filterMode = FilterMode.Point;
         texture2D.wrapMode = TextureWrapMode.Clamp;
 
@@ -78,12 +78,12 @@ public class MapDisplay : MonoBehaviour
             minDistance = Min(minDistance, value);
         }
 
-        for (int y = 0; y < noiseSettings.height; y++)
+        for (int y = 0; y < NoiseSettings.height; y++)
         {
-            for (int x = 0; x < noiseSettings.width; x++)
+            for (int x = 0; x < NoiseSettings.width; x++)
             {
                 float normalizedDistance = InverseLerp(minDistance, maxDistance, map[x, y]);
-                colorMap[y * noiseSettings.width + x] = Color.Lerp(
+                colorMap[y * NoiseSettings.width + x] = Color.Lerp(
                     new Color(
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
@@ -97,7 +97,7 @@ public class MapDisplay : MonoBehaviour
         texture2D.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture2D;
-        transform.localScale = new Vector3(noiseSettings.width, 150, noiseSettings.height) / 150f;
+        transform.localScale = new Vector3(NoiseSettings.width, 150, NoiseSettings.height) / 150f;
 
 
         if (png)

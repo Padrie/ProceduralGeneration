@@ -30,8 +30,8 @@ public class WorldGenerator : MonoBehaviour
                 Vector3 bounds = renderer.bounds.size;
                 Vector3 position = new Vector3(((topLeftX + i) * bounds.x), 0, (topLeftZ - j) * bounds.z);
                 
-                b.noiseSettings.offset.x = position.x / localScale.x;
-                b.noiseSettings.offset.y = position.z / localScale.x;
+                b.NoiseSettings.offset.x = position.x / localScale.x;
+                b.NoiseSettings.offset.y = position.z / localScale.x;
                 b.OnValidate();
                 
                 new ChunkInfo(position);

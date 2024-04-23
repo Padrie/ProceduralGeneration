@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc11ecce84ba8ca4aa01f3aed602ee80, type: 3}
+  m_Name: Preset
+  m_EditorClassIdentifier: 
+  noiseSettings:
+    normalizeMode: 1
+    noiseType: 0
+    width: 150
+    height: 150
+    seed: 0
+    offset: {x: 0, y: 0}
+    heightMultiplier: 150.8
+    randomness: 1
+    scale: 25
+    octaves: 4
+    lacunarity: 2
+    persistence: 0.4
+    turbulence: 1
+    crease: 1
+    invert: 0
+    xyScale: {x: 1, y: 1}

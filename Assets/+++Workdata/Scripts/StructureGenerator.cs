@@ -7,11 +7,13 @@ using UnityEditor.Animations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class RaycastTest : MonoBehaviour
+public class StructureGenerator : MonoBehaviour
 {
     List<GameObject> gameObjects = new List<GameObject>();
     public List<StructureClass> structureList = new List<StructureClass>();
     public int seed;
+    public bool spawnPerChunk;
+    public bool visualize;
     [Space(10)] public LayerMask layerToHit;
 
     [ButtonMethod]
@@ -39,7 +41,7 @@ public class RaycastTest : MonoBehaviour
 
             var plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.transform.localScale = new Vector3(bounds.x / 10, 25, bounds.z / 10);
-            plane.transform.position = new Vector3(transformPosition.x, transformPosition.y + 200, transformPosition.z);
+            plane.transform.position = new Vector3(transformPosition.x, transformPosition.y + 1000, transformPosition.z);
             plane.name = "New Plane";
             plane.transform.parent = parent.transform;
 
@@ -67,9 +69,9 @@ public class RaycastTest : MonoBehaviour
                         {
                             var asset = Instantiate(structureList[k].asset);
                             asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                            asset.transform.localScale = new Vector3(4, 8, 4);
+                            asset.transform.localScale = new Vector3(4, 4, 4);
                             asset.transform.parent = hit.transform;
-                            
+
                             if (structureList[k].canRotate)
                                 asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
                             else
@@ -79,7 +81,9 @@ public class RaycastTest : MonoBehaviour
                 }
             }
         }
-        DestroyImmediate(parent);
+
+        if (!visualize)
+            DestroyImmediate(parent);
     }
 }
 
