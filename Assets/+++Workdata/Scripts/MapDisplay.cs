@@ -5,6 +5,8 @@ using static UnityEngine.Mathf;
 
 public class MapDisplay : MonoBehaviour
 {
+    public static MapDisplay Instance { get; private set; }
+    
     public NoisePreset noisePreset;
     public NoiseSettings NoiseSettings => noisePreset.noiseSettings;
     
@@ -16,7 +18,7 @@ public class MapDisplay : MonoBehaviour
     Renderer textureRender;
 
     private int pngNumber;
-
+    
     private void Awake()
     {
         textureRender = GetComponent<Renderer>();
@@ -25,6 +27,7 @@ public class MapDisplay : MonoBehaviour
     public void OnValidate()
     {
         textureRender = GetComponent<Renderer>();
+        Instance = this;
         if (updateMaterial)
             textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
 
