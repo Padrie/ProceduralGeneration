@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc11ecce84ba8ca4aa01f3aed602ee80, type: 3}
-  m_Name: Moon Surface
+  m_Name: Normal Mountain
   m_EditorClassIdentifier: 
   noiseSettings:
     normalizeMode: 1
-    noiseType: 2
+    noiseType: 1
     width: 150
     height: 150
     seed: 0
     offset: {x: 149, y: -149}
-    heightMultiplier: 24.3
+    heightMultiplier: 175
     randomness: 1
-    scale: 60.4
-    octaves: 4
+    scale: 100
+    octaves: 3
     lacunarity: 2
     persistence: 0.4
-    turbulence: 2
+    turbulence: 1
     crease: 1
-    invert: 1
+    invert: 0
     xyScale: {x: 1, y: 1}

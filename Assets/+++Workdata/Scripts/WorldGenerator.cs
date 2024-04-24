@@ -35,7 +35,8 @@ public class WorldGenerator : MonoBehaviour
                 b.OnValidate();
                 
                 new ChunkInfo(position);
-
+                
+                DestroyImmediate(a.GetComponent<MapDisplay>());
                 //chunkDict.Add(position, new Chunk(meshObject, position));
 
                 a.transform.position = position;
