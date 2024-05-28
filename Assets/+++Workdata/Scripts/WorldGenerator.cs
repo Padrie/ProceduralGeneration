@@ -29,10 +29,13 @@ public class WorldGenerator : MonoBehaviour
 
                 Vector3 bounds = renderer.bounds.size;
                 Vector3 position = new Vector3(((topLeftX + i) * bounds.x), 0, (topLeftZ - j) * bounds.z);
-                
-                b.NoiseSettings.offset.x = position.x / localScale.x;
-                b.NoiseSettings.offset.y = position.z / localScale.x;
-                b.OnValidate();
+
+                for (int k = 0; k < b.noiseTypeStruct.Length; k++)
+                {
+                    b.noiseTypeStruct[k].noisePreset.noiseSettings.offset.x = position.x / localScale.x;
+                    b.noiseTypeStruct[k].noisePreset.noiseSettings.offset.y = position.z / localScale.x;
+                    b.OnValidate();
+                }
                 
                 new ChunkInfo(position);
                 
@@ -43,11 +46,14 @@ public class WorldGenerator : MonoBehaviour
                 a.transform.parent = transform;
             }
         }
+        
+        meshObject.SetActive(false);
     }
 
     [ButtonMethod]
     void Clear()
     {
+        meshObject.SetActive(true);
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(transform.GetChild(i).gameObject);
@@ -61,7 +67,6 @@ public class ChunkInfo
     public ChunkInfo(Vector3 position)
     {
         chunkPosition = position;
-        Debug.Log(position);
     }
 }
 

@@ -19,13 +19,13 @@ MonoBehaviour:
     height: 150
     seed: 0
     offset: {x: 0, y: 0}
-    heightMultiplier: 112.96
+    heightMultiplier: 140.38
     randomness: 1
-    scale: 67.5
+    scale: 128.2
     octaves: 4
     lacunarity: 2
     persistence: 0.4
     turbulence: 2
-    crease: 1
+    crease: 0.94
     invert: 1
     xyScale: {x: 1, y: 1}

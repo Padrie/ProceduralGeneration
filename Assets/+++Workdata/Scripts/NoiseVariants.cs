@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using static UnityEngine.Mathf;
@@ -8,27 +9,14 @@ public class NoiseVariants
     static float Turbulence(float value, NoiseSettings noiseSettings)
     {
         if (noiseSettings.turbulence == 1)
-            value = value;
-        else
-        {
-            value = Abs(value);
-            value = Pow(value, 1f / (noiseSettings.crease + 1));
-        }
+            return value;
 
-        return value;
+        value = Abs(value);
+        return Pow(value, 1f / (noiseSettings.crease + 1));
     }
 
-    public enum NormalizeMode
+    static Vector2[] Seed(NoiseSettings noiseSettings)
     {
-        Local,
-        Global
-    }
-
-    public static float[,] Fbm(NoiseSettings noiseSettings)
-    {
-        float[,] map = new float[noiseSettings.width, noiseSettings.height];
-
-        //Seed
         System.Random prng = new System.Random(noiseSettings.seed);
         Vector2[] seed = new Vector2[noiseSettings.octaves];
         for (int i = 0; i < noiseSettings.octaves; i++)
@@ -38,83 +26,108 @@ public class NoiseVariants
             seed[i] = new Vector2(offsetX, offsetY);
         }
 
+        return seed;
+    }
+
+    public enum NormalizeMode
+    {
+        Local,
+        Global
+    }
+
+    public static float[,] Normalize(float[,] noiseMap, NoiseSettings noiseSettings, int width, int height)
+    {
         float maxNoise = float.MinValue;
         float minNoise = float.MaxValue;
 
-        float halfHeight = noiseSettings.height / 2f;
-        float halfWidth = noiseSettings.width / 2f;
-
-        float maxPossibleHeight = 0f;
-
-        for (int y = 0; y < noiseSettings.height; y++)
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < noiseSettings.width; x++)
+            for (int x = 0; x < width; x++)
             {
-                float noiseHeight = 0f;
-                float amplitude = 0.5f;
-                float frequency = 1f;
-
-                for (int i = 0; i < noiseSettings.octaves; i++)
-                {
-                    float sampleX = (x - halfWidth + seed[i].x) * noiseSettings.xyScale.x / noiseSettings.scale * frequency;
-                    float sampleY = (y - halfHeight - seed[i].y) * noiseSettings.xyScale.y / noiseSettings.scale * frequency;
-
-                    float value = 0f;
-
-                    if (noiseSettings.noiseType == NoiseSettings.NoiseType.ValueNoise2D)
-                        value = Noise.ValueNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
-
-                    if (noiseSettings.noiseType == NoiseSettings.NoiseType.PerlinNoise2D)
-                        value = PerlinNoise(sampleX, sampleY) * 2 - 1;
-
-                    if (noiseSettings.noiseType == NoiseSettings.NoiseType.VoronoiNoise2D)
-                        value = Noise.VoronoiNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
-
-                    if (noiseSettings.noiseType == NoiseSettings.NoiseType.Mix)
-                    {
-                        var a = Noise.ValueNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
-                        value = (PerlinNoise(sampleX, sampleY) * 2 - 1) * a;
-                    }
-
-
-                    value = Turbulence(value, noiseSettings);
-
-                    noiseHeight += value * amplitude;
-                    maxPossibleHeight += amplitude;
-
-                    amplitude *= noiseSettings.persistence;
-                    frequency *= noiseSettings.lacunarity;
-                }
-
-                if (noiseHeight > maxNoise)
-                    maxNoise = noiseHeight;
-                if (noiseHeight < minNoise)
-                    minNoise = noiseHeight;
-
-                map[x, y] = noiseHeight;
+                if (noiseMap[x, y] > maxNoise) maxNoise = noiseMap[x, y];
+                if (noiseMap[x, y] < minNoise) minNoise = noiseMap[x, y];
             }
         }
 
-        for (int y = 0; y < noiseSettings.height; y++)
+        float[,] remappedMap = new float[width, height];
+
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < noiseSettings.width; x++)
+            for (int x = 0; x < width; x++)
             {
                 if (noiseSettings.normalizeMode == NormalizeMode.Global)
                 {
-                    float normalizedHeight = (map[x, y] + 1) / (maxPossibleHeight / 0.9f) * 10000;
-                    map[x, y] = noiseSettings.invert
-                        ? 1 - Clamp(normalizedHeight, 0, int.MaxValue)
-                        : Clamp(normalizedHeight, 0, int.MaxValue);
+                    float normalizedHeight = (noiseMap[x, y] + 1) / 2f;
+                    remappedMap[x, y] = noiseSettings.invert ? 1 - Clamp(normalizedHeight, 0, int.MaxValue) : Clamp(normalizedHeight, 0, int.MaxValue);
+                    //Debug.Log(remappedMap[x,y]);
                 }
                 else
                 {
-                    map[x, y] = noiseSettings.invert
-                        ? 1 - InverseLerp(minNoise, maxNoise, map[x, y])
-                        : InverseLerp(minNoise, maxNoise, map[x, y]);
+                    float normalizedHeight = InverseLerp(minNoise, maxNoise, noiseMap[x, y]);
+                    remappedMap[x, y] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
+                    //Debug.Log(remappedMap[x,y]);
                 }
             }
         }
 
-        return map;
+        return remappedMap;
+    }
+
+    public static float Fbm(int x, int y, NoiseSettings noiseSettings, int width, int height)
+    {
+        Vector2[] seed = Seed(noiseSettings);
+        float noiseHeight = 0f;
+
+        noiseHeight = 0f;
+        float amplitude = 0.5f;
+        float frequency = 1f;
+
+        for (int i = 0; i < noiseSettings.octaves; i++)
+        {
+            float sampleX = (x - (width / 2f) + seed[i].x) * noiseSettings.xyScale.x /
+                noiseSettings.scale * frequency;
+            float sampleY = (y - (height / 2f) - seed[i].y) * noiseSettings.xyScale.y /
+                noiseSettings.scale * frequency;
+
+            float value = 0f;
+
+            if (noiseSettings.noiseType == NoiseSettings.NoiseType.ValueNoise2D)
+                value = Noise.ValueNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
+
+            if (noiseSettings.noiseType == NoiseSettings.NoiseType.PerlinNoise2D)
+                value = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+
+            if (noiseSettings.noiseType == NoiseSettings.NoiseType.VoronoiNoise2D)
+                value = Noise.VoronoiNoise(sampleX, sampleY, noiseSettings.randomness) * 2 - 1;
+
+            value = Turbulence(value, noiseSettings);
+
+            noiseHeight += value * amplitude;
+
+            amplitude *= noiseSettings.persistence;
+            frequency *= noiseSettings.lacunarity;
+        }
+
+        return noiseHeight;
+    }
+
+    public static float[,] Start(NoiseSettings noiseSettings, float strength, int width, int height)
+    {
+        float[,] map = new float[width, height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float noiseValue = Fbm(x, y, noiseSettings, width, height);
+                if(noiseSettings.roundUp) 
+                    noiseValue = Round(noiseValue * noiseSettings.roundTo) * noiseSettings.roundStrength;
+                map[x, y] = noiseValue * strength;
+                if (noiseSettings.curve)
+                    map[x, y] = noiseSettings.animationCurve.Evaluate(map[x, y]);
+            }
+        }
+
+        return Normalize(map, noiseSettings, width, height);
     }
 }

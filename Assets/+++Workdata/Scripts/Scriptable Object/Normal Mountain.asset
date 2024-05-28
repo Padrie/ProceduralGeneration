@@ -18,14 +18,25 @@ MonoBehaviour:
     width: 150
     height: 150
     seed: 0
-    offset: {x: 149, y: -149}
-    heightMultiplier: 175
+    offset: {x: 521.5, y: -521.5}
+    heightMultiplier: 71.8
     randomness: 1
-    scale: 100
-    octaves: 3
+    scale: 48.6
+    octaves: 4
     lacunarity: 2
     persistence: 0.4
     turbulence: 1
-    crease: 1
+    crease: 2.49
     invert: 0
     xyScale: {x: 1, y: 1}
+    strength: 1
+    roundUp: 0
+    roundTo: 10
+    roundStrength: 0.1
+    curve: 0
+    animationCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4

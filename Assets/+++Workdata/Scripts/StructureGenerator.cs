@@ -63,9 +63,7 @@ public class StructureGenerator : MonoBehaviour
                     {
                         structureList[k].name = structureList[k].asset.name;
 
-                        if (structureList[k].invert
-                                ? Mathf.Abs(hit.normal.y) < structureList[k].slopeAngle
-                                : Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle)
+                        if (structureList[k].invert ? Mathf.Abs(hit.normal.y) < structureList[k].slopeAngle : Mathf.Abs(hit.normal.y) > structureList[k].slopeAngle)
                         {
                             var asset = Instantiate(structureList[k].asset);
                             asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);

@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 public static class OldNoise
 {
+    /*
     #region Value Noise
 
     public static float[,] ValueNoise2D(NoiseSettings noiseSettings)
@@ -240,4 +241,5 @@ public static class OldNoise
     }
 
     #endregion
+    */
 }

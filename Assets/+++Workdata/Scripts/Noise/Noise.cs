@@ -1,12 +1,13 @@
 using UnityEngine;
 using static UnityEngine.Mathf;
-using Random = UnityEngine.Random;
+using static PadrieExtension;
 
 public class Noise
 {
     public static float WhiteNoise(Vector2 p)
     {
         float value = Sin(Vector2.Dot(p, new Vector2(12.9898f, 78.233f))) * 43758.5453f;
+        //Debug.Log(value - Floor(value));
         return value - Floor(value);
     }
 
@@ -14,7 +15,7 @@ public class Noise
     
     public static float ValueNoise(float x, float y, float randomness)
     {
-        Vector2 lv = new Vector2(x - Floor(x), y - Floor(y));
+        Vector2 lv = new Vector2(Fract(x), Fract(y));
         Vector2 id = new Vector2(Floor(x), Floor(y));
 
         lv = lv * lv * (Vector2.one * 3f - 2f * lv);

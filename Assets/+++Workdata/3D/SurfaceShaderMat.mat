@@ -138,14 +138,14 @@ Material:
     - _DstBlend: 0
     - _Grass_Height_Blend: -81.7
     - _Grass_Threshold: 0
-    - _Height: 0.01
-    - _MainSmoothness: 0.23
+    - _Height: 1.2
+    - _MainSmoothness: -3.2
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _SecondSmoothness: 0.3
-    - _SecondTextureHeight: -68.3
-    - _SecondTextureThreshold: 0.21
+    - _SecondTextureHeight: -90.9
+    - _SecondTextureThreshold: 0.22
     - _SrcBlend: 1
     - _Surface: 0
     - _Tiling: 10
