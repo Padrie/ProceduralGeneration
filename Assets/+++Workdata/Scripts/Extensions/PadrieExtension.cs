@@ -11,32 +11,6 @@ public static class PadrieExtension
         return newArray;
     }
 
-    // public static float[,] Additive(float[,] array1, float[,] array2, bool @switch)
-    // {
-    //     int height = array1.GetLength(0);
-    //     int width = array1.GetLength(1);
-    //     float[,] newArray = new float[height, width];
-    //
-    //     for (int y = 0; y < height; y++)
-    //     {
-    //         for (int x = 0; x < width; x++)
-    //         {
-    //             if (@switch == true)
-    //             {
-    //                 newArray[y, x] = array1[y, x] + array2[y, x] / 4;
-    //                 //Debug.Log(newArray[y,x]);
-    //             }
-    //             else
-    //             {
-    //                 newArray[y, x] = array1[y, x] + array2[y, x] / 2;
-    //                 //Debug.Log(newArray[y,x]); 
-    //             }
-    //         }
-    //     }
-    //
-    //     return newArray;
-    // }
-
     public static float[,] Additive(TestNoise[] testNoiseArray)
     {
         float[,] newArray = new float[testNoiseArray[0].height, testNoiseArray[0].width];

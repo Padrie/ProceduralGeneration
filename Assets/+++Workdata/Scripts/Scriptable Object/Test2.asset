@@ -15,21 +15,21 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseType: 1
-    seed: 0
-    offset: {x: 298, y: -298}
+    seed: 9
+    offset: {x: 149, y: -149}
     randomness: 1
-    scale: 213
-    octaves: 1
+    scale: 138.45
+    octaves: 6
     lacunarity: 2
     persistence: 0.4
-    turbulence: 2
+    turbulence: 1
     crease: 2.5
     invert: 0
     xyScale: {x: 1, y: 1}
     roundUp: 0
     roundTo: 2
     roundStrength: 0.123
-    curve: 1
+    curve: 0
     animationCurve:
       serializedVersion: 2
       m_Curve:
@@ -47,6 +47,15 @@ MonoBehaviour:
         value: 0.31964955
         inSlope: 1.1465662
         outSlope: 1.1465662
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.48306447
+        value: 0.38752198
+        inSlope: 1.0793517
+        outSlope: 1.0793517
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334

@@ -18,7 +18,7 @@ public class MapDisplay : MonoBehaviour
 
     public int width = 150;
     public int height = 150;
-    [Space(5)] [Min(0.0001f)] public float heightMultiplier = 40f;
+    [Space(5)] [Min(0)] public float heightMultiplier = 40f;
     [Space(5)] public AddType addType;
     public NoiseTypeStruct[] noiseTypeStruct;
     public TestList[] testList;
@@ -46,45 +46,27 @@ public class MapDisplay : MonoBehaviour
         if (updateMaterial) textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
         else textureRender.sharedMaterial = new Material(material);
 
-        if (noiseTypeStruct.Length == 1)
+        TestNoise[] test = new TestNoise[noiseTypeStruct.Length];
+
+        for (int i = 0; i < noiseTypeStruct.Length; i++)
         {
-            float[,] valueMap = NoiseVariants.Start(noiseTypeStruct[0].noisePreset.noiseSettings,
-                noiseTypeStruct[0].strength, width, height);
-            NoiseMapVisualisation(valueMap);
-            DrawMesh(MeshGenerator.GenerateTerrainMesh(valueMap, noiseTypeStruct[0].noisePreset.noiseSettings, width,
-                height, heightMultiplier));
+            test[i] = new TestNoise(noiseTypeStruct[i].noisePreset.noiseSettings, noiseTypeStruct[i].strength,
+                width, height, noiseTypeStruct[i].@override);
         }
-        else
+
+        float[,] mixMap = PadrieExtension.DomainWarping(test);
+
+        for (int y = 0; y < 150; y++)
         {
-            //TestNoise test = new TestNoise(noiseTypeStruct[0].noisePreset.noiseSettings, noiseTypeStruct[0].strength, width,
-            // height);
-
-            TestNoise[] test = new TestNoise[noiseTypeStruct.Length];
-            
-            #region old
-            //     
-            // float[,] mixMap = PadrieExtension.DomainWarping(
-            //     NoiseVariants.Start(noiseTypeStruct[0].noisePreset.noiseSettings, noiseTypeStruct[0].strength,
-            //         width,
-            //         height),
-            //     NoiseVariants.Start(noiseTypeStruct[1].noisePreset.noiseSettings, noiseTypeStruct[1].strength,
-            //         width,
-            //         height), noiseTypeStruct[0].@override);
-            //     
-            #endregion
-
-            for (int i = 0; i < noiseTypeStruct.Length; i++)
+            for (int x = 0; x < 150; x++)
             {
-                test[i] = new TestNoise(noiseTypeStruct[i].noisePreset.noiseSettings, noiseTypeStruct[i].strength,
-                    width, height, noiseTypeStruct[i].@override);
+                //Debug.Log(mixMap[y,x]);
             }
-            
-            float[,] mixMap = PadrieExtension.DomainWarping(test);
-
-            NoiseMapVisualisation(mixMap);
-            DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseTypeStruct[0].noisePreset.noiseSettings, width,
-                height, heightMultiplier));
         }
+        
+        NoiseMapVisualisation(mixMap);
+        DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseTypeStruct[0].noisePreset.noiseSettings, width,
+            height, heightMultiplier));
     }
 
     public void DrawMesh(MeshData meshData)
@@ -230,6 +212,8 @@ public class NoiseSettings
     [Range(0, 5)] public float crease = 1f;
     public bool invert = false;
     [Space(10), Min(.1f)] public Vector2 xyScale = new Vector2(1f, 1f);
+    [Space(10)] public float redistributionModifier = 1.2f;
+    [Range(1, 10)]public int exponent = 5;
     [Space(10)] public bool roundUp;
     [Range(1, 100)] public int roundTo = 10;
     [Range(0.01f, 1f)] public float roundStrength = 0.1f;
