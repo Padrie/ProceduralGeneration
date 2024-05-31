@@ -1,12 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using MyBox;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 public class SpawnWithNoise : MonoBehaviour
 {
@@ -19,16 +15,19 @@ public class SpawnWithNoise : MonoBehaviour
     [Range(0, 10)] public int gizmoAssetIndex;
     [Header("Asset Settings")] public StructureList[] structureLists;
     public GameObject[] gameObjects;
-
+ 
     GameObject parent;
-    List<Vector3> spawnablePositions = new List<Vector3>();
     List<Vector3> spawnableGizmoPositions = new List<Vector3>();
-    List<GameObject> spawnedObject = new List<GameObject>();
+    public Dictionary<GameObject, string> spawnedObject = new Dictionary<GameObject, string>();
 
     System.Random prng;
 
     private void OnValidate()
     {
+        for (int i = 0; i < structureLists.Length; i++)
+        {
+            structureLists[i].name = structureLists[i].asset.name;
+        }
         spawnableGizmoPositions.Clear();
         prng = new System.Random(seed);
 
@@ -58,6 +57,7 @@ public class SpawnWithNoise : MonoBehaviour
     public void StartGeneration()
     {
         Vector3 saved = offset;
+        spawnedObject.Clear();
         
         for (int i = 0; i < gameObjects.Length; i++)
         {
@@ -100,35 +100,50 @@ public class SpawnWithNoise : MonoBehaviour
     [ButtonMethod]
     public void SpawnMapObjects()
     {
-        spawnedObject.Clear();
-
-        parent = new GameObject();
+        parent = new GameObject("Spawned Objects");
 
         for (int i = 0; i < structureLists.Length; i++)
         {
             var positions = structureLists[i].spawnablePositions;
+            float radius = structureLists[i].radius;
+
             for (int j = 0; j < positions.Count * structureLists[i].density; j++)
             {
                 int random = prng.Next(0, positions.Count);
-                Vector3 randomPos = new Vector3((float)prng.NextDouble(), 0, (float)prng.NextDouble());
-                GameObject test = Instantiate(structureLists[i].asset, positions[random] + randomPos, Quaternion.identity);
-                test.transform.parent = parent.transform;
-                spawnedObject.Add(test);
+                Vector3 spawnPos = positions[random];
+
+                if (!IsPositionOccupied(spawnPos, radius))
+                {
+                    Vector3 randomOffset = new Vector3((float)prng.NextDouble(), 0, (float)prng.NextDouble());
+                    GameObject obj = Instantiate(structureLists[i].asset, spawnPos + randomOffset, Quaternion.identity);
+                    obj.transform.parent = parent.transform;
+                    spawnedObject.Add(obj, obj.name);
+                }
             }
         }
 
         print("Spawned " + spawnedObject.Count + " objects");
     }
 
-
     public float Perlin(int x, int y, bool invert)
     {
-        float sampleX = ((float)x + offset.x) / width * scale + seed;
-        float sampleY = ((float)y - offset.z) / height * scale + seed;
+        float sampleX = (x + offset.x) / width * scale + seed;
+        float sampleY = (y - offset.z) / height * scale + seed;
         float perlinValue = Mathf.PerlinNoise(sampleX, sampleY);
         return invert ? 1f - perlinValue : perlinValue;
     }
-
+    
+    private bool IsPositionOccupied(Vector3 position, float radius)
+    {
+        foreach (KeyValuePair<GameObject, string> obj in spawnedObject)
+        {
+            if (Vector3.Distance(obj.Key.transform.position, position) < radius)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private bool ShouldSpawn(float perlin, int index)
     {
@@ -145,7 +160,6 @@ public class SpawnWithNoise : MonoBehaviour
         return false;
     }
 
-    
     private bool ShouldSpawnGizmo(float perlin)
     {
         if (perlin > structureLists[gizmoAssetIndex].spawnRangeValue)
@@ -161,19 +175,14 @@ public class SpawnWithNoise : MonoBehaviour
         return false;
     }
 
-
     private void OnDrawGizmos()
     {
-        float topLeftX = (width - 1) / -2f;
-        float topLeftZ = (height - 1) / 2f;
-
         if (drawGizmo)
         {
             foreach (Vector3 v3 in spawnableGizmoPositions)
             {
                 DrawPlane(v3);
             }
-            //Gizmos.DrawCube(new Vector3(0,0,0), new Vector3(topLeftX * 2, 1, topLeftZ * 2));
         }
     }
 
@@ -195,6 +204,7 @@ public class StructureList
     [HideInInspector] public string name;
     public GameObject asset;
     [Range(0f, 1f)] public float density = 0.2f;
+    [Range(0f, 100f)] public float radius = 1f;
     [Space(5), Range(0.01f, 1f)] public float slopeAngle;
     [Space(5)] public bool invert;
     public bool canRotate;
@@ -204,8 +214,6 @@ public class StructureList
     [Range(0f, 1f)] public float secondarySpawnRangeValue = 0.5f;
     [Range(0f, 1f)] public float secondarySpawnProbability = 0.2f;
     public bool invertNoise;
-    [Space(5)] public bool @override;
-    public SerializedDictionary<Vector3, GameObject> overrideList = new SerializedDictionary<Vector3, GameObject>();
 
     [HideInInspector] public List<Vector3> spawnablePositions = new List<Vector3>();
 }
