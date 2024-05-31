@@ -25,8 +25,9 @@ MonoBehaviour:
     turbulence: 1
     crease: 1
     invert: 0
-    strength: 0.983
     xyScale: {x: 1, y: 1}
+    redistributionModifier: 1.2
+    exponent: 5
     roundUp: 0
     roundTo: 10
     roundStrength: 0.1

@@ -26,7 +26,9 @@ MonoBehaviour:
     crease: 1
     invert: 1
     xyScale: {x: 1, y: 1}
-    roundUp: 1
+    redistributionModifier: -2.37
+    exponent: 5
+    roundUp: 0
     roundTo: 9
     roundStrength: 0.117
     curve: 0

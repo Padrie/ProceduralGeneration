@@ -2,17 +2,13 @@ using System;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using static UnityEngine.Mathf;
-using Random = UnityEngine.Random;
+using static PadrieExtension;
 
 public class NoiseVariants
 {
     static float Turbulence(float value, NoiseSettings noiseSettings)
     {
-        if (noiseSettings.turbulence == 1)
-            return value;
-
-        value = Abs(value);
-        return Pow(value, 1f / (noiseSettings.crease + 1));
+        return IfSwitch(noiseSettings.turbulence -1, value, Pow(Abs(value), 1f / (noiseSettings.crease + 1)));
     }
 
     static Vector2[] Seed(NoiseSettings noiseSettings)
@@ -39,6 +35,8 @@ public class NoiseVariants
     {
         float maxNoise = float.MinValue;
         float minNoise = float.MaxValue;
+        float minHeight = MapDisplay.Instance.heightClamp.x;
+        float maxHeight = MapDisplay.Instance.heightClamp.y;
 
         for (int y = 0; y < height; y++)
         {
@@ -58,7 +56,9 @@ public class NoiseVariants
                 if (noiseSettings.normalizeMode == NormalizeMode.Global)
                 {
                     float normalizedHeight = (noiseMap[y, x] + 1) / 2f;
-                    remappedMap[y, x] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
+                    remappedMap[y, x] = noiseSettings.invert
+                        ? 1 - Clamp(normalizedHeight, minHeight, maxHeight)
+                        : Clamp(normalizedHeight, minHeight, maxHeight);
                     //remappedMap[y, x] = minNoise + (normalizedHeight - 0) * (maxNoise - minNoise) / (1 - 0);
                     //Debug.Log(remappedMap[x,y]);
                 }
@@ -82,7 +82,6 @@ public class NoiseVariants
         noiseHeight = 0f;
         float amplitude = 1f;
         float frequency = 1f;
-        float amplitudeSum = 0f;
 
         for (int i = 0; i < noiseSettings.octaves; i++)
         {
@@ -105,13 +104,12 @@ public class NoiseVariants
             value = Turbulence(value, noiseSettings);
 
             noiseHeight += value * amplitude;
-            amplitudeSum += amplitude;
 
             amplitude *= noiseSettings.persistence;
             frequency *= noiseSettings.lacunarity;
         }
 
-        return noiseHeight / amplitudeSum;
+        return noiseHeight;
     }
 
     public static float[,] Start(NoiseSettings noiseSettings, float strength, int width, int height)
@@ -123,10 +121,10 @@ public class NoiseVariants
             for (int x = 0; x < width; x++)
             {
                 float noiseValue = Fbm(x, y, noiseSettings, width, height);
-                if(noiseSettings.roundUp) 
+                if (noiseSettings.roundUp)
                     noiseValue = Round(noiseValue * noiseSettings.roundTo) * noiseSettings.roundStrength;
                 map[x, y] = noiseValue * strength;
-                map[x, y] *= MapDisplay.Instance.heightMultiplier * 10;
+                map[x, y] *= MapDisplay.Instance.noiseHeightMultiplier * 10;
                 //map[x, y] = Pow(map[x, y] * noiseSettings.redistributionModifier, noiseSettings.exponent);
                 if (noiseSettings.curve)
                     map[x, y] = noiseSettings.animationCurve.Evaluate(map[x, y]);

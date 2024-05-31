@@ -15,11 +15,8 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseType: 2
-    width: 150
-    height: 150
     seed: 0
     offset: {x: 0, y: 0}
-    heightMultiplier: 85.2
     randomness: 1
     scale: 95.7
     octaves: 4
@@ -29,3 +26,15 @@ MonoBehaviour:
     crease: 1
     invert: 0
     xyScale: {x: 1, y: 1}
+    redistributionModifier: 1.2
+    exponent: 5
+    roundUp: 0
+    roundTo: 10
+    roundStrength: 0.1
+    curve: 0
+    animationCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4

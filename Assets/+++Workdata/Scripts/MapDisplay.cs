@@ -18,7 +18,8 @@ public class MapDisplay : MonoBehaviour
 
     public int width = 150;
     public int height = 150;
-    [Space(5)] [Min(0)] public float heightMultiplier = 40f;
+    [Space(5)] [Min(0.1f)] public float noiseHeightMultiplier = 40f;
+    public Vector2Int heightClamp = new Vector2Int(-10, 100);
     [Space(5)] public AddType addType;
     public NoiseTypeStruct[] noiseTypeStruct;
     public TestList[] testList;
@@ -66,7 +67,7 @@ public class MapDisplay : MonoBehaviour
         
         NoiseMapVisualisation(mixMap);
         DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseTypeStruct[0].noisePreset.noiseSettings, width,
-            height, heightMultiplier));
+            height, noiseHeightMultiplier));
     }
 
     public void DrawMesh(MeshData meshData)

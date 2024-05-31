@@ -14,18 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noiseSettings:
     normalizeMode: 1
-    noiseType: 0
+    noiseType: 1
     seed: 0
-    offset: {x: 298, y: -298}
+    offset: {x: 447, y: -447}
     randomness: 1
-    scale: 200
-    octaves: 6
+    scale: 900
+    octaves: 3
     lacunarity: 2
     persistence: 0.4
-    turbulence: 2
+    turbulence: 1
     crease: 0
     invert: 0
     xyScale: {x: 1, y: 1}
+    redistributionModifier: 1.2
+    exponent: 5
     roundUp: 0
     roundTo: 25
     roundStrength: 0.043

@@ -15,17 +15,19 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseType: 1
-    seed: 9
-    offset: {x: 149, y: -149}
+    seed: 0
+    offset: {x: 447, y: -447}
     randomness: 1
-    scale: 138.45
+    scale: 300
     octaves: 6
     lacunarity: 2
     persistence: 0.4
     turbulence: 1
-    crease: 2.5
+    crease: 0
     invert: 0
     xyScale: {x: 1, y: 1}
+    redistributionModifier: 0.8
+    exponent: 2
     roundUp: 0
     roundTo: 2
     roundStrength: 0.123

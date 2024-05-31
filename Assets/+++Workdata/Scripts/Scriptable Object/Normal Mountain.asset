@@ -15,11 +15,8 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseType: 1
-    width: 150
-    height: 150
     seed: 0
     offset: {x: 521.5, y: -521.5}
-    heightMultiplier: 71.8
     randomness: 1
     scale: 48.6
     octaves: 4
@@ -29,7 +26,8 @@ MonoBehaviour:
     crease: 2.49
     invert: 0
     xyScale: {x: 1, y: 1}
-    strength: 1
+    redistributionModifier: 1.2
+    exponent: 5
     roundUp: 0
     roundTo: 10
     roundStrength: 0.1
