@@ -285,7 +285,7 @@ public class DiffusionLimitedAggregation : MonoBehaviour
 
                 angle += interval;
 
-                while (angle < 2 * Mathf.PI)
+                while (angle < 2 * PI)
                 {
                     x = (int)(radius * Cos(angle));
                     y = (int)(radius * Sin(angle));

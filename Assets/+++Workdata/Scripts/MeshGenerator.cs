@@ -18,8 +18,7 @@ public static class MeshGenerator
             {
                 // Vector3 vertexPosition = new Vector3(topLeftX + x, heightMap[x, y] * heightMultiplier,    //OLD, WOULD MOVE THE MESH
                 //     topLeftZ - y);
-                Vector3 vertexPosition = new Vector3(topLeftX + x, heightMap[x, y],
-                    topLeftZ - y);
+                Vector3 vertexPosition = new Vector3(topLeftX + x, heightMap[x, y], topLeftZ - y);
                 meshData.vertices[vertexIndex] = vertexPosition;
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
 

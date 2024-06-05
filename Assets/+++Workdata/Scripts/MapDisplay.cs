@@ -6,23 +6,14 @@ using static UnityEngine.Mathf;
 
 public class MapDisplay : MonoBehaviour
 {
-    public enum AddType
-    {
-        Additive,
-        Subtract,
-        Multiply,
-        Convolve,
-    }
-
     public static MapDisplay Instance { get; private set; }
 
     public int width = 150;
     public int height = 150;
     [Space(5)] [Min(0.1f)] public float noiseHeightMultiplier = 40f;
     public Vector2Int heightClamp = new Vector2Int(-10, 100);
-    [Space(5)] public AddType addType;
-    public NoiseTypeStruct[] noiseTypeStruct;
-    public TestList[] testList;
+    [Space(10)] public NoiseTypeStruct[] noiseType;
+    TestList[] testList;
 
     [Space(10)] public bool updateMaterial;
     public Material material;
@@ -47,12 +38,12 @@ public class MapDisplay : MonoBehaviour
         if (updateMaterial) textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
         else textureRender.sharedMaterial = new Material(material);
 
-        TestNoise[] test = new TestNoise[noiseTypeStruct.Length];
+        TestNoise[] test = new TestNoise[noiseType.Length];
 
-        for (int i = 0; i < noiseTypeStruct.Length; i++)
+        for (int i = 0; i < noiseType.Length; i++)
         {
-            test[i] = new TestNoise(noiseTypeStruct[i].noisePreset.noiseSettings, noiseTypeStruct[i].strength,
-                width, height, noiseTypeStruct[i].@override);
+            test[i] = new TestNoise(noiseType[i].noisePreset.noiseSettings, noiseType[i].strength,
+                width, height, noiseType[i].@override);
         }
 
         float[,] mixMap = PadrieExtension.DomainWarping(test);
@@ -66,7 +57,7 @@ public class MapDisplay : MonoBehaviour
         }
         
         NoiseMapVisualisation(mixMap);
-        DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseTypeStruct[0].noisePreset.noiseSettings, width,
+        DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseType[0].noisePreset.noiseSettings, width,
             height, noiseHeightMultiplier));
     }
 
@@ -190,7 +181,7 @@ public class TestList
 [Serializable]
 public class NoiseSettings
 {
-    public NoiseVariants.NormalizeMode normalizeMode;
+    public NoiseVariants.NormalizeMode normalizeMode = NoiseVariants.NormalizeMode.Global;
 
     public enum NoiseType
     {
@@ -199,12 +190,12 @@ public class NoiseSettings
         VoronoiNoise2D
     }
 
-    public NoiseType noiseType;
+    public NoiseType noiseType = NoiseType.PerlinNoise2D;
 
     public int seed = 0;
     public Vector2 offset;
     [Range(1, 30f)] public float randomness = 1f;
-    [Min(0.0001f)] public float scale = 25f;
+    [Min(0.0001f)] public float scale = 100f;
     [Range(1, 6)] public int octaves = 4;
     [Range(1, 5)] public float lacunarity = 2f;
     [Range(0f, 1f)] public float persistence = 0.4f;
@@ -213,8 +204,6 @@ public class NoiseSettings
     [Range(0, 5)] public float crease = 1f;
     public bool invert = false;
     [Space(10), Min(.1f)] public Vector2 xyScale = new Vector2(1f, 1f);
-    [Space(10)] public float redistributionModifier = 1.2f;
-    [Range(1, 10)]public int exponent = 5;
     [Space(10)] public bool roundUp;
     [Range(1, 100)] public int roundTo = 10;
     [Range(0.01f, 1f)] public float roundStrength = 0.1f;

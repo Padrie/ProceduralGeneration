@@ -56,9 +56,7 @@ public class NoiseVariants
                 if (noiseSettings.normalizeMode == NormalizeMode.Global)
                 {
                     float normalizedHeight = (noiseMap[y, x] + 1) / 2f;
-                    remappedMap[y, x] = noiseSettings.invert
-                        ? 1 - Clamp(normalizedHeight, minHeight, maxHeight)
-                        : Clamp(normalizedHeight, minHeight, maxHeight);
+                    remappedMap[y, x] = noiseSettings.invert ? 1 - Clamp(normalizedHeight, minHeight, maxHeight) : Clamp(normalizedHeight, minHeight, maxHeight);
                     //remappedMap[y, x] = minNoise + (normalizedHeight - 0) * (maxNoise - minNoise) / (1 - 0);
                     //Debug.Log(remappedMap[x,y]);
                 }

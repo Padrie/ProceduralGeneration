@@ -16,7 +16,7 @@ public class SpawnRandom : MonoBehaviour
     public List<GameObject> spawnedObjects = new List<GameObject>();
 
     [ButtonMethod]
-    public void Spawn()
+    public void RandomSpawn()
     {
         List<GameObject> meshObjects = new List<GameObject>();
         meshObjects.Clear();

@@ -22,28 +22,30 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int j = 0; j < size; j++)
             {
-                GameObject a = Instantiate(meshObject);
-                var renderer = a.GetComponent<Renderer>();
-                var b = a.GetComponent<MapDisplay>();
+                GameObject chunk = Instantiate(meshObject);
+                var renderer = chunk.GetComponent<Renderer>();
+                var b = chunk.GetComponent<MapDisplay>();
                 var localScale = meshObject.transform.localScale;
 
                 Vector3 bounds = renderer.bounds.size;
                 Vector3 position = new Vector3(((topLeftX + i) * bounds.x), 0, (topLeftZ - j) * bounds.z);
 
-                for (int k = 0; k < b.noiseTypeStruct.Length; k++)
+                for (int k = 0; k < b.noiseType.Length; k++)
                 {
-                    b.noiseTypeStruct[k].noisePreset.noiseSettings.offset.x = position.x / localScale.x;
-                    b.noiseTypeStruct[k].noisePreset.noiseSettings.offset.y = position.z / localScale.x;
+                    b.noiseType[k].noisePreset.noiseSettings.offset.x = position.x / localScale.x;
+                    b.noiseType[k].noisePreset.noiseSettings.offset.y = position.z / localScale.x;
                     b.OnValidate();
                 }
                 
                 new ChunkInfo(position);
                 
-                DestroyImmediate(a.GetComponent<MapDisplay>());
+                DestroyImmediate(chunk.GetComponent<MapDisplay>());
                 //chunkDict.Add(position, new Chunk(meshObject, position));
 
-                a.transform.position = position;
-                a.transform.parent = transform;
+                chunk.transform.position = position;
+                chunk.transform.parent = transform;
+
+                chunk.isStatic = true;
             }
         }
         
