@@ -20,21 +20,24 @@ public class SpawnWithNoise : MonoBehaviour
     [Header("Asset Settings")] public StructureList[] structureLists;
 
     List<Vector3> spawnableGizmoPositions = new List<Vector3>();
-    Dictionary<GameObject, string> spawnedObject = new Dictionary<GameObject, string>();
+    public SerializedDictionary<GameObject, string> spawnedObject = new SerializedDictionary<GameObject, string>();
 
     List<StructureList> noiseStructureLists = new List<StructureList>();
     List<StructureList> randomStructureLists = new List<StructureList>();
 
     System.Random prng;
 
-    private void OnValidate()
+    void OnValidate()
     {
         spawnableGizmoPositions.Clear();
         prng = new System.Random(seed);
 
-        for (int i = 0; i < structureLists.Length; i++)
+        width = MapDisplay.Instance.width;
+        height = MapDisplay.Instance.height;
+
+        foreach (var structure in structureLists)
         {
-            //structureLists[i].name = structureLists[i].assets[0].name;
+            structure.name = structure.assets[0].name;
 
             transform.position = offset;
 
@@ -48,13 +51,11 @@ public class SpawnWithNoise : MonoBehaviour
             {
                 for (int y = 0; y < height; y += 3)
                 {
-                    float perlin =
-                        Round(Perlin(x, y, structureLists[gizmoAssetIndex].invertNoise) * 100) / 100;
+                    float perlin = Round(Perlin(x, y, structureLists[gizmoAssetIndex].invertNoise) * 100) / 100;
 
                     if (ShouldSpawnGizmo(perlin))
                     {
-                        spawnableGizmoPositions.Add(new Vector3(topLeftX + offset.x + x, 0,
-                            topLeftZ + offset.z - y));
+                        spawnableGizmoPositions.Add(new Vector3(topLeftX + offset.x + x, 0, topLeftZ + offset.z - y));
                     }
                 }
             }
@@ -89,7 +90,7 @@ public class SpawnWithNoise : MonoBehaviour
                     offset = meshObjects[j].transform.position;
                     CreateMap();
                 }
-                
+
                 offset = saved;
             }
             else
@@ -101,7 +102,7 @@ public class SpawnWithNoise : MonoBehaviour
         }
     }
 
-    public void CreateMap()
+    void CreateMap()
     {
         prng = new System.Random(seed);
 
@@ -129,18 +130,19 @@ public class SpawnWithNoise : MonoBehaviour
         SpawnMapObjects();
     }
 
-    public void SpawnMapObjects()
+   void SpawnMapObjects()
     {
         for (int i = 0; i < noiseStructureLists.Count; i++)
         {
+            var positions = noiseStructureLists[i].spawnablePositions;
+            float radius = noiseStructureLists[i].radius;
+            
+            int totalObjectsToSpawn = (int)(positions.Count * noiseStructureLists[i].density);
+            int objectsPerAsset = totalObjectsToSpawn / noiseStructureLists[i].assets.Length / 5;
+
             for (int k = 0; k < noiseStructureLists[i].assets.Length; k++)
             {
-                var positions = noiseStructureLists[i].spawnablePositions;
-                float radius = noiseStructureLists[i].radius;
-
-                for (int j = 0;
-                     j < (positions.Count * noiseStructureLists[i].density / 10) / noiseStructureLists[i].assets.Length;
-                     j++)
+                for (int j = 0; j < objectsPerAsset; j++)
                 {
                     int random = prng.Next(0, positions.Count);
                     Vector3 spawnPos = positions[random];
@@ -156,38 +158,36 @@ public class SpawnWithNoise : MonoBehaviour
                                     ? Abs(hit.normal.y) < noiseStructureLists[i].slopeAngle
                                     : Abs(hit.normal.y) > noiseStructureLists[i].slopeAngle)
                             {
-                                var obj = Instantiate(noiseStructureLists[i].assets[k]);
-                                obj.transform.position = new Vector3((hit.point.x + spawnPos.x) / 2, hit.point.y + spawnPos.y / 2, (hit.point.z + spawnPos.z) / 2);
-                                obj.transform.parent = hit.transform;
-                                spawnedObject.Add(obj, obj.name);
-                                obj.isStatic = true;
+                                var asset = Instantiate(noiseStructureLists[i].assets[k], hit.transform, true);
+                                asset.transform.position = new Vector3((hit.point.x + spawnPos.x) / 2,
+                                    hit.point.y + spawnPos.y / 2, (hit.point.z + spawnPos.z) / 2);
+                                spawnedObject.Add(asset, asset.name);
+                                asset.isStatic = true;
 
                                 if (noiseStructureLists[i].canRotate)
                                 {
                                     var normal = new Vector3(hit.normal.x * noiseStructureLists[i].rotate, 1,
                                         hit.normal.z * noiseStructureLists[i].rotate);
 
-                                    obj.transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
+                                    asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
                                 }
                                 else
-                                    obj.transform.rotation = Quaternion.identity;
+                                    asset.transform.rotation = Quaternion.identity;
                             }
                         }
                     }
                 }
-
-                positions.Clear();
             }
+
+            positions.Clear();
         }
     }
 
-
-    public void RandomSpawn()
+    void RandomSpawn()
     {
         List<GameObject> meshObjects = new List<GameObject>();
         meshObjects.Clear();
-        Vector3 combinedBounds = new Vector3();
-        System.Random prng = new System.Random(seed);
+        System.Random random = new System.Random(seed);
 
         foreach (Transform child in transform)
         {
@@ -196,29 +196,23 @@ public class SpawnWithNoise : MonoBehaviour
 
         var renderer = meshObjects[0].gameObject.GetComponent<Renderer>();
         Vector3 bounds = renderer.bounds.size;
-        combinedBounds = Vector3Additive(bounds, bounds);
+        var combinedBounds = Vector3Additive(bounds, bounds);
 
-        GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        gameObject.transform.localScale = combinedBounds / (20f / Sqrt(meshObjects.Count));
-        gameObject.transform.position = new Vector3(0, 500, 0);
+        GameObject primitive = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        primitive.transform.localScale = combinedBounds / (20f / Sqrt(meshObjects.Count));
+        primitive.transform.position = new Vector3(0, 500, 0);
 
         for (int i = 0; i < randomStructureLists.Count; i++)
         {
             for (int k = 0; k < randomStructureLists[i].assets.Length; k++)
             {
-                print("yur");
-                for (int j = 0;
-                     j < (meshObjects.Count * randomStructureLists[i].density * 5000) /
-                     randomStructureLists[i].assets.Length;
-                     j++)
+                for (int j = 0; j < (meshObjects.Count * randomStructureLists[i].density * 5000) / randomStructureLists[i].assets.Length; j++)
                 {
-                    Vector3 rng = new Vector3((float)prng.NextDouble() * combinedBounds.x,
-                        (float)prng.NextDouble() * combinedBounds.y,
-                        (float)prng.NextDouble() * combinedBounds.z) - combinedBounds * 0.5f;
-                    Ray ray = new Ray(new Vector3(
-                        gameObject.transform.position.x + rng.x * (Sqrt(meshObjects.Count) / 2),
-                        gameObject.transform.position.y,
-                        gameObject.transform.position.z + rng.z * (Sqrt(meshObjects.Count) / 2)), Vector3.down);
+                    Vector3 rng = new Vector3((float)random.NextDouble() * combinedBounds.x,
+                        (float)random.NextDouble() * combinedBounds.y,
+                        (float)random.NextDouble() * combinedBounds.z) - combinedBounds * 0.5f;
+                    var position = primitive.transform.position;
+                    Ray ray = new Ray(new Vector3(position.x + rng.x * (Sqrt(meshObjects.Count) / 2), position.y, position.z + rng.z * (Sqrt(meshObjects.Count) / 2)), Vector3.down);
 
                     if (Physics.Raycast(ray, out RaycastHit hit, 10000, layerToHit))
                     {
@@ -228,15 +222,19 @@ public class SpawnWithNoise : MonoBehaviour
                                 ? Abs(hit.normal.y) < randomStructureLists[i].slopeAngle
                                 : Abs(hit.normal.y) > randomStructureLists[i].slopeAngle)
                         {
-                            var asset = Instantiate(randomStructureLists[i].assets[k]);
+                            var asset = Instantiate(randomStructureLists[i].assets[k], hit.transform, true);
                             asset.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                            asset.transform.parent = hit.transform;
                             asset.isStatic = true;
 
                             spawnedObject.Add(asset, asset.name);
 
                             if (randomStructureLists[i].canRotate)
-                                asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                            {
+                                var normal = new Vector3(hit.normal.x * randomStructureLists[i].rotate, 1,
+                                    hit.normal.z * randomStructureLists[i].rotate);
+
+                                asset.transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
+                            }
                             else
                                 asset.transform.rotation = Quaternion.identity;
                         }
@@ -245,10 +243,10 @@ public class SpawnWithNoise : MonoBehaviour
             }
         }
 
-        DestroyImmediate(gameObject);
+        DestroyImmediate(primitive);
     }
 
-    public float Perlin(int x, int y, bool invert)
+    float Perlin(int x, int y, bool invert)
     {
         float sampleX = (x + offset.x) / width * scale + seed;
         float sampleY = (y - offset.z) / height * scale + seed;
@@ -256,7 +254,7 @@ public class SpawnWithNoise : MonoBehaviour
         return invert ? 1f - perlinValue : perlinValue;
     }
 
-    private bool IsPositionOccupied(Vector3 position, float radius)
+    bool IsPositionOccupied(Vector3 position, float radius)
     {
         foreach (KeyValuePair<GameObject, string> obj in spawnedObject)
         {
@@ -269,7 +267,7 @@ public class SpawnWithNoise : MonoBehaviour
         return false;
     }
 
-    private bool ShouldSpawn(float perlin, int index)
+    bool ShouldSpawn(float perlin, int index)
     {
         if (perlin > noiseStructureLists[index].spawnRangeValue)
         {
@@ -284,7 +282,7 @@ public class SpawnWithNoise : MonoBehaviour
         return false;
     }
 
-    private bool ShouldSpawnGizmo(float perlin)
+    bool ShouldSpawnGizmo(float perlin)
     {
         if (perlin > structureLists[gizmoAssetIndex].spawnRangeValue)
         {
@@ -299,7 +297,7 @@ public class SpawnWithNoise : MonoBehaviour
         return false;
     }
 
-    private void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected()
     {
         if (drawGizmo)
         {
@@ -310,7 +308,7 @@ public class SpawnWithNoise : MonoBehaviour
         }
     }
 
-    public void DrawPlane(Vector3 position)
+    void DrawPlane(Vector3 position)
     {
         Vector3 corner0 = position + Vector3.forward / 2 + Vector3.down * 5;
         Vector3 corner2 = position - Vector3.forward / 2 + Vector3.down * 5;
@@ -352,8 +350,8 @@ public class StructureList
     [Range(0f, 1f)] public float density = 0.2f;
     [Range(0f, 100f)] public float radius = 1f;
     [Space(5), Range(0.01f, 1f)] public float slopeAngle;
-    [Space(5)] public bool invert;
-    public bool canRotate;
+    public bool invert;
+    [Space(5)] public bool canRotate;
     [Range(0.01f, 1f)] public float rotate;
 
     [Header("Noise Map Settings")] [Range(0f, 1f)]

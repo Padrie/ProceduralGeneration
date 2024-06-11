@@ -25,12 +25,6 @@ public class NoiseVariants
         return seed;
     }
 
-    public enum NormalizeMode
-    {
-        Local,
-        Global
-    }
-
     public static float[,] Normalize(float[,] noiseMap, NoiseSettings noiseSettings, int width, int height)
     {
         float maxNoise = float.MinValue;
@@ -53,19 +47,12 @@ public class NoiseVariants
         {
             for (int x = 0; x < width; x++)
             {
-                if (noiseSettings.normalizeMode == NormalizeMode.Global)
-                {
                     float normalizedHeight = (noiseMap[y, x] + 1) / 2f;
                     remappedMap[y, x] = noiseSettings.invert ? 1 - Clamp(normalizedHeight, minHeight, maxHeight) : Clamp(normalizedHeight, minHeight, maxHeight);
-                    //remappedMap[y, x] = minNoise + (normalizedHeight - 0) * (maxNoise - minNoise) / (1 - 0);
-                    //Debug.Log(remappedMap[x,y]);
-                }
-                else
-                {
-                    float normalizedHeight = InverseLerp(minNoise, maxNoise, noiseMap[y, x]);
-                    remappedMap[y, x] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
-                    //Debug.Log(remappedMap[x,y]);
-                }
+
+                    // float normalizedHeight = InverseLerp(minNoise, maxNoise, noiseMap[y, x]);
+                    // remappedMap[y, x] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
+                    // //Debug.Log(remappedMap[x,y]);
             }
         }
 

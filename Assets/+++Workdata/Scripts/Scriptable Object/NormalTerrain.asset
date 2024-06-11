@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: NormalTerrain
   m_EditorClassIdentifier: 
   noiseSettings:
-    normalizeMode: 1
+    offset: {x: 149, y: -149}
     noiseType: 1
     seed: 0
-    offset: {x: 149, y: -149}
     randomness: 1
     scale: 300
     octaves: 6

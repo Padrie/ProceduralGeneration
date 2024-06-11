@@ -4,15 +4,6 @@ using static UnityEngine.Mathf;
 
 public static class PadrieExtension
 {
-    public static float[,] Convolute(float[,] array1, float[,] array2)
-    {
-        int height = array1.GetLength(0);
-        int width = array1.GetLength(1);
-        float[,] newArray = new float[height, width];
-
-        return newArray;
-    }
-
     public static float[,] Additive(TestNoise[] testNoiseArray)
     {
         float[,] newArray = new float[testNoiseArray[0].height, testNoiseArray[0].width];
@@ -54,7 +45,7 @@ public static class PadrieExtension
         return @switch ? @true : @false;
     }
     
-    public static float IfSwitch(int value, float @zero, float @one)
+    public static float IfSwitch(int value, float zero, float one)
     {
         bool @switch = false;
 
@@ -63,7 +54,7 @@ public static class PadrieExtension
         else
             @switch = true;
 
-        return @switch ? @zero : @one;
+        return @switch ? zero : one;
     }
 
     public static Vector3 Vector3Mutliply(Vector3 first, Vector3 second)

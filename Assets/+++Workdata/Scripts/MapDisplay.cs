@@ -181,7 +181,7 @@ public class TestList
 [Serializable]
 public class NoiseSettings
 {
-    public NoiseVariants.NormalizeMode normalizeMode = NoiseVariants.NormalizeMode.Global;
+    [HideInInspector] public Vector2 offset = new Vector2(149, -149);
 
     public enum NoiseType
     {
@@ -193,7 +193,6 @@ public class NoiseSettings
     public NoiseType noiseType = NoiseType.PerlinNoise2D;
 
     public int seed = 0;
-    public Vector2 offset;
     [Range(1, 30f)] public float randomness = 1f;
     [Min(0.0001f)] public float scale = 100f;
     [Range(1, 6)] public int octaves = 4;
