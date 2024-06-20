@@ -2,8 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightMap, NoiseSettings noiseSettings, int width, int height,
-        float heightMultiplier)
+    public static MeshData GenerateTerrainMesh(float[,] heightMap, NoiseSettings noiseSettings, int width, int height)
 
     {
         float topLeftX = (width - 1) / -2f;

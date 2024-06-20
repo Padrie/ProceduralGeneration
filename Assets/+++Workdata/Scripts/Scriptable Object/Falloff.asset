@@ -15,8 +15,8 @@ MonoBehaviour:
   noiseSettings:
     offset: {x: 149, y: -149}
     noiseType: 2
-    seed: 55
-    randomness: 1
+    seed: 388
+    randomness: 30
     scale: 200
     octaves: 1
     lacunarity: 1

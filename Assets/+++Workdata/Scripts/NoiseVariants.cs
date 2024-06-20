@@ -8,7 +8,7 @@ public class NoiseVariants
 {
     static float Turbulence(float value, NoiseSettings noiseSettings)
     {
-        return IfSwitch(noiseSettings.turbulence -1, value, Pow(Abs(value), 1f / (noiseSettings.crease + 1)));
+        return IfSwitch(noiseSettings.turbulence - 1, value, Pow(Abs(value), 1f / (noiseSettings.crease + 1)));
     }
 
     static Vector2[] Seed(NoiseSettings noiseSettings)
@@ -47,12 +47,14 @@ public class NoiseVariants
         {
             for (int x = 0; x < width; x++)
             {
-                    float normalizedHeight = (noiseMap[y, x] + 1) / 2f;
-                    remappedMap[y, x] = noiseSettings.invert ? 1 - Clamp(normalizedHeight, minHeight, maxHeight) : Clamp(normalizedHeight, minHeight, maxHeight);
+                float normalizedHeight = (noiseMap[y, x] + 1) / 2f;
+                remappedMap[y, x] = noiseSettings.invert
+                    ? 1 - Clamp(normalizedHeight, minHeight, maxHeight)
+                    : Clamp(normalizedHeight, minHeight, maxHeight);
 
-                    // float normalizedHeight = InverseLerp(minNoise, maxNoise, noiseMap[y, x]);
-                    // remappedMap[y, x] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
-                    // //Debug.Log(remappedMap[x,y]);
+                // float normalizedHeight = InverseLerp(minNoise, maxNoise, noiseMap[y, x]);
+                // remappedMap[y, x] = noiseSettings.invert ? 1 - normalizedHeight : normalizedHeight;
+                // //Debug.Log(remappedMap[x,y]);
             }
         }
 
@@ -70,9 +72,9 @@ public class NoiseVariants
 
         for (int i = 0; i < noiseSettings.octaves; i++)
         {
-            float sampleX = (x - (width / 2f) + seed[i].x) * noiseSettings.xyScale.x /
+            float sampleX = (x - width / 2f + seed[i].x) * noiseSettings.xyScale.x /
                 noiseSettings.scale * frequency;
-            float sampleY = (y - (height / 2f) - seed[i].y) * noiseSettings.xyScale.y /
+            float sampleY = (y - height / 2f - seed[i].y) * noiseSettings.xyScale.y /
                 noiseSettings.scale * frequency;
 
             float value = 0f;
@@ -105,12 +107,12 @@ public class NoiseVariants
         {
             for (int x = 0; x < width; x++)
             {
-                float noiseValue = Fbm(x, y, noiseSettings, width, height);
+                float noiseValue = Fbm(x, y, noiseSettings, width, height) * strength;
                 if (noiseSettings.roundUp)
                     noiseValue = Round(noiseValue * noiseSettings.roundTo) * noiseSettings.roundStrength;
-                map[x, y] = noiseValue * strength;
-                map[x, y] *= MapDisplay.Instance.noiseHeightMultiplier * 10;
-                //map[x, y] = Pow(map[x, y] * noiseSettings.redistributionModifier, noiseSettings.exponent);
+                map[x, y] = noiseValue;
+                map[x, y] *= MapDisplay.Instance.noiseHeightMultiplier;
+
                 if (noiseSettings.curve)
                     map[x, y] = noiseSettings.animationCurve.Evaluate(map[x, y]);
             }

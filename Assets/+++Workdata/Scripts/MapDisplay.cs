@@ -10,14 +10,13 @@ public class MapDisplay : MonoBehaviour
 
     public int width = 150;
     public int height = 150;
-    [Space(5)] [Min(0.1f)] public float noiseHeightMultiplier = 40f;
-    public Vector2Int heightClamp = new Vector2Int(-10, 100);
+    public Vector2Int heightClamp = new Vector2Int(-1000, 1000);
+    [Min(0.1f)] public float noiseHeightMultiplier = 10f;
     [Space(10)] public NoiseTypeStruct[] noiseType;
     TestList[] testList;
 
     [Space(10)] public bool updateMaterial;
     public Material material;
-    public int isolines;
     [SerializeField] private string pngName;
     [SerializeField] bool png = false;
 
@@ -35,7 +34,8 @@ public class MapDisplay : MonoBehaviour
         textureRender = GetComponent<Renderer>();
         Instance = this;
 
-        if (updateMaterial) textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+        if (updateMaterial)
+            textureRender.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
         else textureRender.sharedMaterial = new Material(material);
 
         TestNoise[] test = new TestNoise[noiseType.Length];
@@ -55,10 +55,10 @@ public class MapDisplay : MonoBehaviour
                 //Debug.Log(mixMap[y,x]);
             }
         }
-        
+
         NoiseMapVisualisation(mixMap);
         DrawMesh(MeshGenerator.GenerateTerrainMesh(mixMap, noiseType[0].noisePreset.noiseSettings, width,
-            height, noiseHeightMultiplier));
+            height));
     }
 
     public void DrawMesh(MeshData meshData)
@@ -84,14 +84,15 @@ public class MapDisplay : MonoBehaviour
             minDistance = Min(minDistance, value);
         }
 
+        float isolines = 0;
+
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 float normalizedDistance = InverseLerp(minDistance, maxDistance, map[x, y]);
                 colorMap[y * width + x] = Color.Lerp(
-                    new Color(
-                        -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
+                    new Color(-1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1),
                         -1 * SmoothStep(0, Abs(Sin(isolines * normalizedDistance)), 1)),
                     Color.white,
@@ -131,7 +132,8 @@ public class TestNoise
     public int height;
     public bool @override;
 
-    public TestNoise(NoiseSettings noiseSettings, float noiseStrength, int noiseWidth, int noiseHeight, bool _override)
+    public TestNoise(NoiseSettings noiseSettings, float noiseStrength, int noiseWidth, int noiseHeight,
+        bool _override)
     {
         noiseSetting = noiseSettings;
         strength = noiseStrength;
@@ -181,8 +183,6 @@ public class TestList
 [Serializable]
 public class NoiseSettings
 {
-    [HideInInspector] public Vector2 offset = new Vector2(149, -149);
-
     public enum NoiseType
     {
         ValueNoise2D,
@@ -203,6 +203,7 @@ public class NoiseSettings
     [Range(0, 5)] public float crease = 1f;
     public bool invert = false;
     [Space(10), Min(.1f)] public Vector2 xyScale = new Vector2(1f, 1f);
+    public Vector2 offset = new Vector2(149, -149);
     [Space(10)] public bool roundUp;
     [Range(1, 100)] public int roundTo = 10;
     [Range(0.01f, 1f)] public float roundStrength = 0.1f;

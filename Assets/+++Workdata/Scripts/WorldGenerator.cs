@@ -15,6 +15,7 @@ public class WorldGenerator : MonoBehaviour
     [ButtonMethod]
     private void Spawn()
     {
+        SpawnWithNoise noise = GetComponent<SpawnWithNoise>();
         float topLeftX = (size - 1) / -2f;
         float topLeftZ = (size - 1) / 2f;
 
@@ -28,7 +29,7 @@ public class WorldGenerator : MonoBehaviour
                 var localScale = meshObject.transform.localScale;
 
                 Vector3 bounds = renderer.bounds.size;
-                Vector3 position = new Vector3(((topLeftX + i) * bounds.x), 0, (topLeftZ - j) * bounds.z);
+                Vector3 position = new Vector3((topLeftX + i) * bounds.x, 0, (topLeftZ - j) * bounds.z);
 
                 for (int k = 0; k < b.noiseType.Length; k++)
                 {
@@ -50,6 +51,7 @@ public class WorldGenerator : MonoBehaviour
         }
         
         meshObject.SetActive(false);
+        noise.OnValidate();
     }
 
     [ButtonMethod]

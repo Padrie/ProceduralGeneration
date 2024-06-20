@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: NormalTerrain
   m_EditorClassIdentifier: 
   noiseSettings:
-    offset: {x: 149, y: -149}
     noiseType: 1
     seed: 0
     randomness: 1
@@ -25,6 +24,7 @@ MonoBehaviour:
     crease: 0
     invert: 0
     xyScale: {x: 1, y: 1}
+    offset: {x: 149, y: -149}
     roundUp: 0
     roundTo: 2
     roundStrength: 0.123
