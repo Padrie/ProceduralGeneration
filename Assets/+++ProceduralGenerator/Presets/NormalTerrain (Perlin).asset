@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc11ecce84ba8ca4aa01f3aed602ee80, type: 3}
+  m_Name: NormalTerrain (Perlin)
+  m_EditorClassIdentifier: 
+  noiseSettings:
+    noiseType: 1
+    seed: 0
+    randomness: 1
+    scale: 100
+    octaves: 5
+    lacunarity: 2
+    persistence: 0.4
+    turbulence: 1
+    crease: 0
+    invert: 0
+    xyScale: {x: 1, y: 1}
+    offset: {x: 149, y: -149}
+    roundUp: 0
+    roundTo: 1
+    roundStrength: 0.056
+    curve: 0
+    animationCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: -176.53696
+        value: 12.397663
+        inSlope: -0.19762023
+        outSlope: -0.19762023
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.598662
+        outWeight: 0.43939617
+      - serializedVersion: 3
+        time: 8.109932
+        value: -121.93747
+        inSlope: -0.8914772
+        outSlope: -0.8914772
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.21100266
+      - serializedVersion: 3
+        time: 172.29738
+        value: -387.57297
+        inSlope: -0.46275645
+        outSlope: -0.46275645
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 199.7095
+        value: -387.97653
+        inSlope: 0.029230118
+        outSlope: 0.029230118
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.3749702
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
