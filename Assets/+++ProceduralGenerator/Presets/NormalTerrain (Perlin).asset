@@ -16,7 +16,7 @@ MonoBehaviour:
     noiseType: 1
     seed: 0
     randomness: 1
-    scale: 100
+    scale: 106.78
     octaves: 5
     lacunarity: 2
     persistence: 0.4
