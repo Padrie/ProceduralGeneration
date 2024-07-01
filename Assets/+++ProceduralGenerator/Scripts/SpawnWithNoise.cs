@@ -51,6 +51,11 @@ public class SpawnWithNoise : MonoBehaviour
             a++;
         }
 
+        if (seed >= 2000)
+            seed = 2000;
+        if (seed <= -2000)
+            seed = -2000;
+
         spawnableGizmoPositions.Clear();
         prng = new System.Random(seed); // creates seed
 
