@@ -20,7 +20,7 @@ I've always wanted to make an endless World, with interesting landmarks to explo
 
 - A tool to place assets on your procedural generated terrain
 - Ability to spawn assets randomly or with a noise map
-- Randomly selects asset in an array if multiple are present
+- Randomly selects asset in an array if multiple are presentd
 - Adjustable alignment of asset on the normals of the terrain
 - Adjustable slider to spawn assets on flat or steep terrain
 - Gizmo visualization to roughly see the result
